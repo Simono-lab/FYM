@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D1C2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<title>FreeYourMind</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box }
+html { scroll-behavior:smooth }
+body { font-family:'DM Sans',sans-serif; background:#0D1C2B; color:#F8F6F2; -webkit-font-smoothing:antialiased }
+
+/* ── TOPBAR ── */
+.topbar {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; gap:12px;
+  padding:0 32px; height:52px;
+  background:rgba(13,28,43,.9);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.tb-logo {
+  font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700;
+  color:#F8F6F2; cursor:pointer; letter-spacing:.3px; flex-shrink:0;
+  text-decoration:none;
+}
+.tb-logo span { color:#C8956A; font-style:italic }
+.tb-actions { display:flex; gap:8px; margin-left:auto; align-items:center }
+.btn-tb {
+  padding:5px 13px; border-radius:20px;
+  border:1px solid rgba(255,255,255,.13); background:transparent;
+  color:rgba(255,255,255,.65); font-size:.67rem; cursor:pointer;
+  transition:all .2s; font-family:'DM Sans',sans-serif; text-decoration:none;
+}
+.btn-tb:hover { border-color:#C8956A; color:#C8956A; background:rgba(200,149,106,.1) }
+.lang-toggle {
+  display:flex; background:rgba(255,255,255,.07); border-radius:20px;
+  padding:2px; gap:2px; border:1px solid rgba(255,255,255,.1);
+}
+.lang-btn {
+  padding:4px 10px; border-radius:16px; border:none;
+  background:transparent; color:rgba(255,255,255,.38);
+  font-size:.63rem; font-weight:600; cursor:pointer; transition:all .2s;
+  font-family:'DM Sans',sans-serif; letter-spacing:.05em;
+}
+.lang-btn.active { background:#C8956A; color:#0A1520 }
+
+/* ── HERO ── */
+.hero {
+  min-height:100dvh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:100px 32px 80px;
+  position:relative; text-align:center;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(200,149,106,.08) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 50%,rgba(26,46,68,.5) 0%,transparent 60%);
+}
+.hero-rule {
+  position:absolute; top:52px; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,#C8956A 30%,#C8956A 70%,transparent);
+}
+.hero-inner { position:relative; max-width:560px }
+.hero-badge {
+  display:inline-block; padding:4px 14px;
+  border:1px solid rgba(200,149,106,.35); border-radius:20px;
+  font-size:.6rem; letter-spacing:3px; text-transform:uppercase;
+  color:#C8956A; margin-bottom:24px;
+}
+.hero-title {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.4rem,6vw,3.8rem); font-weight:700;
+  line-height:1.1; color:#F8F6F2; margin-bottom:16px;
+}
+.hero-title em { color:#C8956A; font-style:italic }
+.hero-lines {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.4rem,4vw,2rem); font-weight:400;
+  color:#F8F6F2; line-height:1.65; margin-bottom:28px;
+}
+.hero-lines span { display:block }
+.hero-lines .muted { color:rgba(248,246,242,.4); font-size:clamp(1.15rem,3.5vw,1.7rem) }
+.hero-pivot {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(.9rem,2.2vw,1.05rem);
+  color:#C8956A; font-style:italic; margin-bottom:48px;
+}
+.hero-cta {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:14px 36px;
+  background:#C8956A; color:#0D1C2B;
+  font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:700;
+  letter-spacing:.04em; text-decoration:none; border:none; cursor:pointer;
+  border-radius:48px; transition:all .22s;
+  box-shadow:0 4px 20px rgba(200,149,106,.25);
+}
+.hero-cta:hover { background:#DEB08A; transform:translateY(-2px); box-shadow:0 8px 28px rgba(200,149,106,.32) }
+.hero-cta svg { width:13px; height:13px; transition:transform .2s }
+.hero-cta:hover svg { transform:translateX(3px) }
+
+/* Scroll indicator — hidden by default, shown only on first load */
+.scroll-hint {
+  position:absolute; bottom:32px; left:50%;
+  transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  cursor:pointer; text-decoration:none;
+  transition:opacity .4s;
+}
+.scroll-hint.hidden { opacity:0; pointer-events:none }
+.scroll-hint span { font-size:.58rem; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.4) }
+.scroll-hint-line {
+  width:1px; height:28px;
+  background:linear-gradient(to bottom,#C8956A,transparent);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:.35}50%{opacity:1} }
+
+/* ── CONTENT ── */
+.content { background:#F5F3EF; color:#1A2E44 }
+.content-inner { max-width:640px; margin:0 auto; padding:88px 32px 80px }
+.intro-block { margin-bottom:64px }
+.intro-block p { font-size:.98rem; line-height:1.85; color:#2A3A4A; margin-bottom:18px }
+.intro-block p:last-child { margin-bottom:0 }
+.intro-block strong { color:#1A2E44; font-weight:600 }
+.sep { display:flex; align-items:center; gap:16px; margin:52px 0 }
+.sep-line { flex:1; height:1px; background:#E0DAD2 }
+.sep-diamond { width:6px; height:6px; background:#C8956A; transform:rotate(45deg); flex-shrink:0 }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-bottom:64px }
+.col-label {
+  font-size:.58rem; letter-spacing:4px; text-transform:uppercase;
+  color:#C8956A; font-weight:600; margin-bottom:18px;
+  display:flex; align-items:center; gap:10px;
+}
+.col-label::after { content:''; flex:1; height:1px; background:#E0DAD2 }
+.col-item {
+  display:flex; align-items:flex-start; gap:8px;
+  margin-bottom:12px; font-size:.83rem; line-height:1.55; color:#4A5A6B;
+}
+.col-item::before { content:'—'; color:#C8956A; flex-shrink:0; margin-top:1px }
+.does .col-item { color:#1A2E44 }
+.closing-block { text-align:center; padding:56px 0 0; border-top:1px solid #E0DAD2 }
+.closing-rule { width:40px; height:2px; background:#C8956A; margin:0 auto 28px }
+.closing-block p { font-size:.92rem; line-height:1.85; color:#2A3A4A; margin-bottom:14px; max-width:480px; margin-left:auto; margin-right:auto }
+.closing-sig { font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:#8C9DAD; margin:36px 0 44px }
+.closing-cta {
+  display:inline-flex; align-items:center; gap:10px; padding:14px 36px;
+  background:#1A2E44; color:#F8F6F2;
+  font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:700;
+  letter-spacing:.04em; text-decoration:none; border:none; cursor:pointer;
+  border-radius:48px; transition:all .22s;
+  box-shadow:0 4px 16px rgba(26,46,68,.2);
+}
+.closing-cta:hover { background:#243D58; transform:translateY(-2px); box-shadow:0 8px 24px rgba(26,46,68,.28) }
+.closing-cta svg { width:13px; height:13px; transition:transform .2s }
+.closing-cta:hover svg { transform:translateX(3px) }
+
+/* ── FOOTER ── */
+.footer { background:#0A1520; padding:28px 32px; text-align:center; border-top:1px solid rgba(255,255,255,.05) }
+.footer p { font-size:.6rem; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.18) }
+
+/* ── ANIMATIONS ── */
+.fade-up { opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease }
+.fade-up.visible { opacity:1; transform:translateY(0) }
+.fade-up:nth-child(2){transition-delay:.08s}
+.fade-up:nth-child(3){transition-delay:.16s}
+.fade-up:nth-child(4){transition-delay:.24s}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .two-col { grid-template-columns:1fr; gap:36px }
+  .content-inner { padding:72px 20px 64px }
+  .hero { padding:90px 20px 72px }
+  .topbar { padding:0 16px }
+}
+@media(max-width:380px){
+  .lang-btn { padding:3px 7px; font-size:.58rem }
+  .hero-cta, .closing-cta { padding:12px 26px; font-size:.78rem }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a class="tb-logo" href="index.html">Free<span>YourMind</span></a>
+  <div class="tb-actions">
+    <a class="btn-tb" href="app.html#questionnaire" id="tb-cta"></a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-rule"></div>
+  <div class="hero-inner">
+    <div class="hero-badge" id="hero-badge"></div>
+    <div class="hero-lines" id="hero-lines"></div>
+    <div class="hero-pivot" id="hero-pivot"></div>
+    <a class="hero-cta" href="app.html#questionnaire" id="hero-cta">
+      <span id="hero-cta-text"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+    </a>
+  </div>
+  <a class="scroll-hint" id="scroll-hint" href="#content">
+    <span id="scroll-label"></span>
+    <div class="scroll-hint-line"></div>
+  </a>
+</section>
+
+<!-- CONTENT -->
+<section class="content" id="content">
+  <div class="content-inner">
+    <div class="intro-block fade-up" id="intro-block"></div>
+    <div class="sep fade-up"><div class="sep-line"></div><div class="sep-diamond"></div><div class="sep-line"></div></div>
+    <div class="two-col fade-up">
+      <div class="col-block">
+        <div class="col-label" id="col-not-label"></div>
+        <div id="col-not"></div>
+      </div>
+      <div class="col-block does">
+        <div class="col-label" id="col-does-label"></div>
+        <div id="col-does"></div>
+      </div>
+    </div>
+    <div class="closing-block fade-up">
+      <div class="closing-rule"></div>
+      <p id="closing-p"></p>
+      <div class="closing-sig" id="closing-sig"></div>
+      <a class="closing-cta" href="app.html#questionnaire" id="closing-cta">
+        <span id="closing-cta-text"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="footer"><p id="footer-p"></p></div>
+
+<script>
+const CONTENT = {
+  fr: {
+    badge:'Prompt Structurel V5',
+    lines:['Vous vous connaissez bien.','Vous avez lu.','Vous avez travaillé sur vous-même.','Vous avez essayé de changer.','&nbsp;','Et pourtant,','des freins persistent.'],
+    muted:[false,false,false,true,false,false,false],
+    pivot:'Il y a une raison à ça.',
+    cta:'Commencer',
+    tb_cta:'Commencer',
+    scroll:'En savoir plus',
+    intro:`<p>Il existe de très nombreux modèles d'analyse de la psyché humaine. Ils sont tous utiles — mais chacun éclaire une facette différente : profils de personnalité, structures d'ombre, généalogie, cycles temporels.</p>
+<p>Pris séparément, aucun ne produit une image complète. Il n'existe pas de solution aujourd'hui pour avoir une vision absolue de la structure humaine interne.</p>
+<p><strong>FYM n'a pas cette ambition.</strong></p>
+<p>En revanche, en rapprochant des modèles indépendants choisis pour leur complémentarité, il devient possible d'identifier leurs synergies — et leurs contradictions. Ce sont précisément ces contradictions qui correspondent à nos conflits intérieurs les plus actifs.</p>
+<p>Les voir nommées avec précision, depuis plusieurs angles simultanément, produit quelque chose que chaque approche isolée ne peut pas produire : <strong>une cartographie des structures sous-jacentes de la personnalité.</strong></p>
+<p>FYM est le résultat de ce croisement appliqué à un individu unique.</p>`,
+    col_not:'FYM ne fait pas',
+    col_does:'FYM fait',
+    not_items:['Il ne dit pas qui vous êtes','Il ne dit pas qui vous devriez être','Il ne propose pas de programme de transformation','Il ne cherche pas à vous valider, vous encourager ou à vous consoler'],
+    does_items:['Il montre comment la structure identitaire s\'est construite','Il nomme les mécaniques qui tournent automatiquement','Il identifie ce qui freine et ce qui est déjà là','Il ouvre vers ce qui devient possible quand ces mécaniques sont vues — non comme des défauts à corriger, mais comme une architecture à reconnaître'],
+    closing_p:'Un questionnaire. Douze approches croisées. Une note de synthèse construite pour un seul individu — vous.',
+    sig:'« La créativité ne se libère pas. Elle se révèle. »',
+    footer:'FreeYourMind · Document confidentiel'
+  },
+  en: {
+    badge:'Structural Prompt V5',
+    lines:['You know yourself well.','You have read.','You have worked on yourself.','You have tried to change.','&nbsp;','And yet,','obstacles persist.'],
+    muted:[false,false,false,true,false,false,false],
+    pivot:'There is a reason for that.',
+    cta:'Begin',
+    tb_cta:'Begin',
+    scroll:'Learn more',
+    intro:`<p>There are many models for analysing the human psyche. They are all useful — but each illuminates a different facet: personality profiles, shadow structures, genealogy, temporal cycles.</p>
+<p>Taken separately, none produces a complete picture. There is no solution today for an absolute view of the human internal structure.</p>
+<p><strong>FYM does not have that ambition.</strong></p>
+<p>However, by bringing together independent models chosen for their complementarity, it becomes possible to identify their synergies — and their contradictions. These contradictions are precisely what correspond to our most active inner conflicts.</p>
+<p>Seeing them named with precision, from multiple angles simultaneously, produces something that no isolated approach can produce: <strong>a mapping of the underlying structures of personality.</strong></p>
+<p>FYM is the result of this crossover applied to one unique individual.</p>`,
+    col_not:'FYM does not',
+    col_does:'FYM does',
+    not_items:['It does not tell you who you are','It does not tell you who you should be','It does not propose a transformation programme','It does not seek to validate, encourage or console you'],
+    does_items:['It shows how the identity structure was built','It names the mechanics that run automatically','It identifies what is holding back and what is already there','It opens towards what becomes possible when these mechanics are seen — not as flaws to correct, but as an architecture to recognise'],
+    closing_p:'One questionnaire. Twelve crossed approaches. A synthesis note built for one individual — you.',
+    sig:'"Creativity is not gained, it is revealed."',
+    footer:'FreeYourMind · Confidential document'
+  }
+};
+
+let LANG = localStorage.getItem('fym_lang') || (navigator.language||'fr').slice(0,2);
+if(LANG !== 'fr' && LANG !== 'en') LANG = 'fr';
+
+// Scroll hint — hide once user scrolls
+const scrollHint = document.getElementById('scroll-hint');
+let scrollHidden = false;
+window.addEventListener('scroll', () => {
+  if (!scrollHidden && window.scrollY > 60) {
+    scrollHint.classList.add('hidden');
+    scrollHidden = true;
+  }
+}, { passive:true });
+
+// Intersection observer for fade-up
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold:0.12 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+function setLang(l) {
+  LANG = l;
+  localStorage.setItem('fym_lang', l);
+  document.getElementById('btn-fr').classList.toggle('active', l==='fr');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  document.documentElement.lang = l;
+  render();
+}
+
+function render() {
+  const C = CONTENT[LANG];
+  document.getElementById('hero-badge').textContent = C.badge;
+  document.getElementById('hero-pivot').textContent = C.pivot;
+  document.getElementById('hero-cta-text').textContent = C.cta;
+  document.getElementById('tb-cta').textContent = C.tb_cta;
+  document.getElementById('scroll-label').textContent = C.scroll;
+  document.getElementById('intro-block').innerHTML = C.intro;
+  document.getElementById('col-not-label').textContent = C.col_not;
+  document.getElementById('col-does-label').textContent = C.col_does;
+  document.getElementById('col-not').innerHTML = C.not_items.map(i=>`<div class="col-item">${i}</div>`).join('');
+  document.getElementById('col-does').innerHTML = C.does_items.map(i=>`<div class="col-item">${i}</div>`).join('');
+  document.getElementById('closing-p').textContent = C.closing_p;
+  document.getElementById('closing-sig').textContent = C.sig;
+  document.getElementById('closing-cta-text').textContent = C.cta;
+  document.getElementById('footer-p').textContent = C.footer;
+
+  // Hero lines with animation
+  const linesEl = document.getElementById('hero-lines');
+  linesEl.innerHTML = C.lines.map((l, i) =>
+    `<span class="${C.muted[i]?'muted':''}" style="opacity:0;transform:translateY(10px);transition:opacity .55s ease ${i*.07}s,transform .55s ease ${i*.07}s">${l}</span>`
+  ).join('');
+  setTimeout(() => {
+    linesEl.querySelectorAll('span').forEach(s => {
+      s.style.opacity = '1'; s.style.transform = 'translateY(0)';
+    });
+  }, 80);
+}
+
+setLang(LANG);
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0A1520">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FYM">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<title>FreeYourMind</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:#0A1520;color:#F8F6F2;-webkit-font-smoothing:antialiased}
+
+.scene{position:relative;width:100vw;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+/* Photo background */
+.photo-bg{
+  position:absolute;inset:0;
+  background-image:url('woman.jpeg');
+  background-size:cover;
+  background-position:center 18%;
+  z-index:0;
+}
+.photo-bg::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,
+    rgba(10,21,32,.7) 0%,
+    rgba(10,21,32,.3) 28%,
+    rgba(10,21,32,.2) 50%,
+    rgba(10,21,32,.55) 75%,
+    rgba(10,21,32,.9) 100%);
+  z-index:1;
+}
+.photo-bg::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 35%,rgba(10,21,32,.35) 100%);
+  z-index:2;
+}
+
+/* Topbar */
+.topbar{
+  position:relative;z-index:10;
+  display:flex;align-items:center;gap:16px;
+  padding:26px 40px;
+}
+
+/* Logo */
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.logo-mark{
+  width:40px;height:40px;border-radius:13px;
+  background:rgba(200,149,106,.12);
+  border:1px solid rgba(200,149,106,.3);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  flex-shrink:0;transition:all .25s ease;
+}
+.logo:hover .logo-mark{background:rgba(200,149,106,.22);border-color:rgba(200,149,106,.55)}
+.logo-mark svg{width:20px;height:20px}
+.logo-wordmark{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.2rem;font-weight:400;
+  color:#F8F6F2;letter-spacing:.05em;
+}
+.logo-wordmark em{color:rgba(200,149,106,.85);font-style:italic}
+
+/* Nav */
+.nav{display:flex;align-items:center;gap:6px;margin-left:auto}
+.nav-link{
+  padding:6px 15px;border-radius:22px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.6);font-size:.7rem;letter-spacing:.03em;
+  cursor:pointer;transition:all .22s;
+  font-family:'DM Sans',sans-serif;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  text-decoration:none;
+}
+.nav-link:hover{border-color:rgba(200,149,106,.45);color:#F8F6F2;background:rgba(200,149,106,.1)}
+
+/* Lang toggle */
+.lang-toggle{
+  display:flex;background:rgba(255,255,255,.07);
+  border-radius:20px;padding:2px;gap:2px;
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.lang-btn{
+  padding:5px 10px;border-radius:16px;border:none;
+  background:transparent;color:rgba(255,255,255,.38);
+  font-size:.63rem;font-weight:600;cursor:pointer;transition:all .2s;
+  font-family:'DM Sans',sans-serif;letter-spacing:.05em;
+}
+.lang-btn.active{background:#C8956A;color:#0A1520}
+
+/* Center content */
+.center{
+  position:relative;z-index:10;flex:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:0 32px;text-align:center;
+}
+.center-inner{max-width:500px}
+
+.display-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.8rem,13vw,8.5rem);
+  font-weight:300;line-height:.92;
+  letter-spacing:-.015em;
+  color:#F8F6F2;
+  text-shadow:0 2px 48px rgba(0,0,0,.25);
+  margin-bottom:26px;
+}
+.display-name em{color:rgba(200,149,106,.88);font-style:italic}
+
+.gold-rule{
+  width:44px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,149,106,.7),transparent);
+  margin:0 auto 24px;
+}
+
+.signature{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(.9rem,2.2vw,1.1rem);
+  font-style:italic;font-weight:300;
+  color:rgba(248,246,242,.5);
+  letter-spacing:.025em;line-height:1.5;
+  margin-bottom:44px;
+}
+
+/* CTAs */
+.cta-group{display:flex;flex-direction:column;align-items:center;gap:14px}
+.btn-main{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:13px 34px;
+  background:rgba(200,149,106,.9);
+  color:#0A1520;
+  font-family:'DM Sans',sans-serif;
+  font-size:.78rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  text-decoration:none;border:none;cursor:pointer;border-radius:50px;
+  transition:all .25s ease;
+  box-shadow:0 4px 24px rgba(200,149,106,.22);
+}
+.btn-main:hover{background:#C8956A;transform:translateY(-2px);box-shadow:0 8px 30px rgba(200,149,106,.32)}
+.btn-main svg{width:12px;height:12px;transition:transform .2s}
+.btn-main:hover svg{transform:translateX(3px)}
+
+.btn-ghost-sm{
+  font-size:.67rem;color:rgba(255,255,255,.35);
+  cursor:pointer;transition:color .2s;
+  background:none;border:none;
+  font-family:'DM Sans',sans-serif;letter-spacing:.04em;
+  text-decoration:none;
+}
+.btn-ghost-sm:hover{color:rgba(255,255,255,.7)}
+
+/* Bottom bar */
+.bottom{
+  position:relative;z-index:10;
+  padding:0 40px 28px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+}
+.bottom-wordmark{
+  font-size:.55rem;letter-spacing:5px;text-transform:uppercase;
+  color:rgba(255,255,255,.18);
+}
+.bottom-scroll{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;opacity:.32;transition:opacity .2s;text-decoration:none;
+}
+.bottom-scroll:hover{opacity:.65}
+.bottom-scroll span{font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:#F8F6F2}
+.scroll-line{
+  width:1px;height:22px;
+  background:linear-gradient(to bottom,#C8956A,transparent);
+  animation:pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.display-name{animation:fadeUp .9s ease .1s both}
+.gold-rule{animation:fadeUp .6s ease .4s both}
+.signature{animation:fadeUp .6s ease .55s both}
+.cta-group{animation:fadeUp .6s ease .7s both}
+
+/* Responsive */
+@media(max-width:600px){
+  .topbar{padding:18px 18px;gap:10px}
+  .bottom{padding:0 18px 20px}
+  .nav-link.desktop{display:none}
+  .display-name{margin-bottom:18px}
+  .signature{margin-bottom:32px}
+  .bottom-wordmark{display:none}
+}
+@media(max-width:380px){
+  .lang-btn{padding:4px 8px;font-size:.58rem}
+  .btn-main{padding:12px 26px;font-size:.74rem}
+  .display-name{font-size:clamp(3rem,15vw,5rem)}
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="photo-bg"></div>
+
+  <div class="topbar">
+    <a class="logo" href="index.html">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="8.5" stroke="rgba(200,149,106,.8)" stroke-width="1"/>
+          <path d="M9 9.5C9 8.1 10.1 7 11.5 7H15" stroke="rgba(200,149,106,.9)" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M9 12h5" stroke="rgba(200,149,106,.9)" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M9 14.5v2.5" stroke="rgba(200,149,106,.6)" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-wordmark">Free<em>Your</em>Mind</div>
+    </a>
+
+    <nav class="nav">
+      <a class="nav-link desktop" id="nav-about" href="about.html"></a>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+    </nav>
+  </div>
+
+  <div class="center">
+    <div class="center-inner">
+      <div class="display-name">Free<em>Your</em><br>Mind</div>
+      <div class="gold-rule"></div>
+      <div class="signature" id="sig"></div>
+      <div class="cta-group">
+        <a class="btn-main" id="btn-start" href="about.html">
+          <span id="btn-start-text"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12,5 19,12 12,19"/>
+          </svg>
+        </a>
+        <a class="btn-ghost-sm" id="btn-prod" href="app.html#production"></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="bottom-wordmark">F R E E &nbsp; Y O U R &nbsp; M I N D</div>
+    <a class="bottom-scroll" href="about.html">
+      <span id="scroll-label"></span>
+      <div class="scroll-line"></div>
+    </a>
+  </div>
+</div>
+
+<script>
+const C = {
+  fr: { sig:'« La créativité ne se libère pas. Elle se révèle. »', start:'Commencer', prod:'Espace production', about:'En savoir plus', scroll:'Découvrir' },
+  en: { sig:'"Creativity is not gained, it is revealed."', start:'Begin', prod:'Production space', about:'Learn more', scroll:'Discover' }
+};
+
+let LANG = (localStorage.getItem('fym_lang') || (navigator.language||'fr').slice(0,2));
+if(LANG !== 'fr' && LANG !== 'en') LANG = 'fr';
+
+function setLang(l) {
+  LANG = l;
+  localStorage.setItem('fym_lang', l);
+  document.getElementById('btn-fr').classList.toggle('active', l==='fr');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  document.documentElement.lang = l;
+  const t = C[l];
+  document.getElementById('sig').textContent = t.sig;
+  document.getElementById('btn-start-text').textContent = t.start;
+  document.getElementById('btn-prod').textContent = t.prod;
+  document.getElementById('nav-about').textContent = t.about;
+  document.getElementById('scroll-label').textContent = t.scroll;
+}
+
+setLang(LANG);
+</script>
+</body>
+</html>
