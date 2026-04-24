@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0D1C2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FYM">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<title>FreeYourMind</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@300;400&family=Noto+Sans:wght@300;400;500&subset=cyrillic&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Light editorial palette */
+  --bg: #F5F3EF;
+  --bg2: #EDE9E3;
+  --surface: #FFFFFF;
+  --surface2: #FAF9F6;
+  --border: #E0DAD2;
+  --border-mid: #C8BFB4;
+
+  /* Navy */
+  --navy: #0D1C2B;
+  --navy2: #1A2E44;
+  --navy3: #243D58;
+  --navy-soft: #E8EDF3;
+
+  /* Gold */
+  --gold: #C8956A;
+  --gold2: #DEB08A;
+  --gold-pale: #F5EDE4;
+  --gold-border: rgba(200,149,106,.3);
+
+  /* Text */
+  --text: #1A2E44;
+  --text2: #4A5A6B;
+  --text3: #7A8A98;
+  --text-inv: #F8F6F2;
+
+  /* Status */
+  --ok: #3D7A55;
+  --ok-bg: #EBF5EF;
+  --warn: #8B6914;
+  --warn-bg: #FEF8E7;
+
+  /* Shadows */
+  --sh-sm: 0 1px 4px rgba(26,46,68,.08), 0 2px 12px rgba(26,46,68,.06);
+  --sh: 0 2px 8px rgba(26,46,68,.1), 0 8px 32px rgba(26,46,68,.08);
+  --sh-lg: 0 8px 32px rgba(26,46,68,.15);
+
+  --r: 12px;
+  --rs: 8px;
+  --tr: all .2s cubic-bezier(.4,0,.2,1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent }
+html, body { height:100% }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased }
+
+/* ── APP SHELL ── */
+#root { height:100dvh; display:flex; flex-direction:column; overflow:hidden }
+.page { flex:1; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent }
+
+/* ── TOPBAR ── */
+.topbar {
+  display:flex; align-items:center; gap:12px;
+  padding:0 28px; height:54px;
+  background:var(--navy); flex-shrink:0;
+  position:relative; z-index:100;
+}
+.topbar::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:rgba(255,255,255,.06) }
+.tb-logo { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:#F8F6F2; cursor:pointer; letter-spacing:.3px; flex-shrink:0 }
+.tb-logo span { color:var(--gold); font-style:italic }
+.tb-sep { width:1px; height:18px; background:rgba(255,255,255,.12); flex-shrink:0 }
+.tb-breadcrumb { font-size:.72rem; color:rgba(255,255,255,.45); flex:1 }
+.tb-breadcrumb em { color:rgba(200,149,106,.9) }
+.tb-actions { display:flex; gap:8px; margin-left:auto }
+.btn-tb { padding:5px 14px; border-radius:20px; border:1px solid rgba(255,255,255,.15); background:transparent; color:rgba(255,255,255,.7); font-size:.68rem; cursor:pointer; transition:var(--tr); font-family:'DM Sans',sans-serif; white-space:nowrap }
+.btn-tb:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,149,106,.1) }
+.btn-tb.primary { background:var(--gold); border-color:var(--gold); color:var(--navy); font-weight:600 }
+.btn-tb.primary:hover { filter:brightness(1.08) }
+
+/* ── BUTTONS ── */
+.btn { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; border-radius:var(--rs); border:none; font-size:.82rem; font-weight:500; cursor:pointer; transition:var(--tr); font-family:'DM Sans',sans-serif }
+.btn-primary { background:var(--gold); color:var(--navy); font-weight:600 }
+.btn-primary:hover { background:var(--gold2); transform:translateY(-1px); box-shadow:0 4px 16px rgba(200,149,106,.3) }
+.btn-secondary { background:var(--surface); color:var(--text2); border:1px solid var(--border) }
+.btn-secondary:hover { border-color:var(--gold); color:var(--gold) }
+.btn-ghost { background:transparent; color:var(--text3); border:1px solid var(--border) }
+.btn-ghost:hover { background:var(--surface); color:var(--text) }
+.btn-sm { padding:7px 16px; font-size:.75rem }
+.btn-xs-light { padding:5px 12px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--text2); font-size:.68rem; cursor:pointer; transition:var(--tr); font-family:'DM Sans',sans-serif }
+.btn-xs-light:hover { border-color:var(--gold); color:var(--gold) }
+.btn-danger { background:transparent; border:1px solid #E0B0B0; color:#B05050 }
+.btn-danger:hover { background:#FEF0F0 }
+.btn:disabled { opacity:.45; cursor:default; transform:none !important }
+
+/* ── LANDING ── */
+.landing { min-height:100%; display:flex; flex-direction:column }
+.landing-hero {
+  background:var(--navy); color:var(--text-inv);
+  padding:80px 48px; display:flex; align-items:center; justify-content:center; min-height:70vh;
+  position:relative; overflow:hidden;
+}
+.landing-hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(200,149,106,.1) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 50%,rgba(26,46,68,.5) 0%,transparent 60%);
+}
+.landing-inner { position:relative; max-width:560px; text-align:center }
+.landing-badge { display:inline-block; padding:4px 14px; border:1px solid var(--gold-border); border-radius:20px; font-size:.62rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:24px }
+.landing-title { font-family:'Playfair Display',serif; font-size:clamp(2.5rem,6vw,4rem); font-weight:700; line-height:1.1; color:#F8F6F2; margin-bottom:16px }
+.landing-title em { color:var(--gold); font-style:italic }
+.landing-sub { font-size:.9rem; color:rgba(248,246,242,.65); line-height:1.75; margin-bottom:48px }
+.landing-ctas { display:flex; gap:14px; justify-content:center; flex-wrap:wrap }
+.landing-footer { background:var(--surface2); border-top:1px solid var(--border); padding:40px 48px; text-align:center }
+.lf-tagline { font-family:'Playfair Display',serif; font-style:italic; color:var(--text3); font-size:.9rem }
+
+/* ── WIZARD NAV ── */
+.wiz-nav {
+  position:sticky; top:0; z-index:80;
+  background:var(--surface); border-bottom:1px solid var(--border);
+  box-shadow:var(--sh-sm);
+  padding:0 24px;
+  display:flex; align-items:center; gap:12px; height:52px;
+  flex-shrink:0;
+}
+.wiz-home { display:flex; align-items:center; gap:6px; color:var(--text3); font-size:.75rem; cursor:pointer; transition:var(--tr); text-decoration:none; flex-shrink:0 }
+.wiz-home:hover { color:var(--gold) }
+.wiz-home svg { width:14px; height:14px }
+.wiz-nav-sep { width:1px; height:20px; background:var(--border); flex-shrink:0 }
+.wiz-sections { display:flex; gap:4px; flex:1 }
+.wiz-sec-btn { width:32px; height:32px; border-radius:50%; border:1.5px solid var(--border); background:transparent; color:var(--text3); font-size:.72rem; font-weight:600; cursor:pointer; transition:var(--tr); font-family:'DM Sans',sans-serif; display:flex; align-items:center; justify-content:center }
+.wiz-sec-btn:hover { border-color:var(--gold); color:var(--gold) }
+.wiz-sec-btn.active { background:var(--gold); border-color:var(--gold); color:var(--navy); box-shadow:0 2px 8px rgba(200,149,106,.35) }
+.wiz-sec-btn.done { background:var(--ok-bg); border-color:var(--ok); color:var(--ok) }
+.wiz-progress-wrap { flex:1; max-width:120px }
+.wiz-progress-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden }
+.wiz-progress-fill { height:100%; background:var(--gold); border-radius:2px; transition:width .4s ease }
+.wiz-progress-label { font-size:.6rem; color:var(--text3); margin-top:3px; text-align:right }
+.wiz-arrows { display:flex; gap:6px; flex-shrink:0 }
+.wiz-arrow { width:34px; height:34px; border-radius:var(--rs); border:1px solid var(--border); background:var(--surface); color:var(--text2); cursor:pointer; transition:var(--tr); display:flex; align-items:center; justify-content:center }
+.wiz-arrow:hover:not(:disabled) { border-color:var(--navy2); background:var(--navy2); color:#fff }
+.wiz-arrow:disabled { opacity:.3; cursor:default }
+.wiz-arrow svg { width:14px; height:14px }
+
+/* ── QUESTIONNAIRE ── */
+.wizard-body { max-width:700px; margin:0 auto; padding:36px 24px 80px }
+.wsec { background:var(--surface); border-radius:var(--r); box-shadow:var(--sh-sm); overflow:hidden; margin-bottom:20px }
+.wsec-head { padding:24px 28px 20px; border-bottom:1px solid var(--border); display:flex; align-items:flex-end; gap:16px; background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%) }
+.wsec-letter { font-family:'Playfair Display',serif; font-size:3.5rem; color:var(--gold); line-height:1 }
+.wsec-info { padding-bottom:4px }
+.wsec-suplabel { font-size:.58rem; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.4) }
+.wsec-title { font-family:'Playfair Display',serif; font-size:1.15rem; color:#F8F6F2; line-height:1.2 }
+.wsec-intro { font-size:.75rem; color:rgba(255,255,255,.5); font-style:italic; margin-top:4px; line-height:1.5 }
+.wsec-body { padding:24px 28px }
+
+.wf { margin-bottom:16px }
+.wlabel { font-size:.65rem; font-weight:500; letter-spacing:.07em; text-transform:uppercase; color:var(--text3); margin-bottom:6px; display:block }
+.winput { width:100%; padding:9px 13px; background:var(--bg); border:1.5px solid var(--border); border-radius:var(--rs); color:var(--text); font-family:'DM Sans',sans-serif; font-size:.85rem; outline:none; transition:var(--tr) }
+.winput:focus { border-color:var(--gold); background:var(--surface); box-shadow:0 0 0 3px rgba(200,149,106,.12) }
+.winput::placeholder { color:var(--text3); opacity:.7 }
+textarea.winput { resize:vertical; min-height:80px; line-height:1.6 }
+textarea.winput.tall { min-height:110px }
+textarea.winput.xtall { min-height:150px }
+
+.wg2 { display:grid; grid-template-columns:1fr 1fr; gap:12px }
+.wg3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px }
+.wdiv { height:1px; background:var(--border); margin:20px 0 }
+
+.wchk { display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border-radius:var(--rs); cursor:pointer; transition:var(--tr); font-size:.82rem; color:var(--text2); line-height:1.45; user-select:none }
+.wchk:hover { background:var(--gold-pale) }
+.wchk.on { background:var(--gold-pale); color:var(--navy2) }
+.wchk-box { width:18px; height:18px; border-radius:5px; border:1.5px solid var(--border-mid); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:var(--tr); background:var(--surface) }
+.wchk.on .wchk-box { background:var(--gold); border-color:var(--gold) }
+.wchk-box svg { display:none; width:10px; height:10px }
+.wchk.on .wchk-box svg { display:block }
+
+.wrad-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px }
+.wrad { display:flex; align-items:flex-start; gap:9px; padding:9px 12px; border-radius:var(--rs); cursor:pointer; transition:var(--tr); font-size:.8rem; color:var(--text3); line-height:1.4; user-select:none; border:1.5px solid transparent }
+.wrad:hover { background:var(--gold-pale); color:var(--text2) }
+.wrad.on { background:var(--gold-pale); border-color:var(--gold-border); color:var(--navy2) }
+.wrad-letter { font-size:.65rem; font-weight:700; color:var(--gold); width:14px; flex-shrink:0; margin-top:2px; font-family:'DM Mono',monospace }
+.wrad-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid var(--border-mid); flex-shrink:0; margin-top:2px; transition:var(--tr); background:var(--surface) }
+.wrad.on .wrad-dot { border-color:var(--gold); background:var(--gold) }
+
+.lieu-row { display:grid; grid-template-columns:22px 3fr 1fr; gap:8px; align-items:center; margin-bottom:6px }
+.lieu-num { font-size:.7rem; color:var(--text3); text-align:right; font-family:'DM Mono',monospace }
+
+.wq-text { font-size:.85rem; color:var(--text); line-height:1.65; margin-bottom:10px }
+.wq-num { color:var(--gold); font-size:.68rem; font-family:'DM Mono',monospace; margin-right:5px; font-weight:700 }
+
+.wiz-footer { display:flex; align-items:center; justify-content:space-between; background:var(--surface); border-top:1px solid var(--border); padding:16px 24px; position:sticky; bottom:0; z-index:70; box-shadow:0 -2px 12px rgba(26,46,68,.06) }
+.wiz-footer-info { font-size:.72rem; color:var(--text3) }
+.wiz-footer-actions { display:flex; gap:10px }
+
+/* ── SUCCESS ── */
+.success-page { max-width:540px; margin:0 auto; padding:60px 24px }
+.success-icon { width:64px; height:64px; border-radius:50%; background:var(--ok-bg); border:2px solid var(--ok); display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-size:1.6rem; color:var(--ok) }
+.success-title { font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--text); text-align:center; margin-bottom:10px }
+.success-sub { text-align:center; font-size:.85rem; color:var(--text2); line-height:1.7; margin-bottom:36px }
+
+.code-card { background:var(--surface); border-radius:var(--r); box-shadow:var(--sh-sm); overflow:hidden; margin-bottom:16px; border:1px solid var(--border) }
+.code-card-head { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border); background:var(--bg) }
+.code-card-label { font-size:.62rem; letter-spacing:3px; text-transform:uppercase; color:var(--text3) }
+.code-body { padding:14px 16px; font-family:'DM Mono',monospace; font-size:.7rem; color:var(--text2); line-height:1.6; word-break:break-all; max-height:100px; overflow-y:auto }
+
+.info-box { background:var(--gold-pale); border:1px solid var(--gold-border); border-radius:var(--rs); padding:14px 18px; font-size:.8rem; color:var(--text2); line-height:1.65 }
+.info-box strong { color:var(--navy2) }
+
+/* ── PRODUCTION ── */
+.prod-page { max-width:1080px; margin:0 auto; padding:36px 28px 80px }
+.prod-title { font-family:'Playfair Display',serif; font-size:2rem; color:var(--text); margin-bottom:4px }
+.prod-sub { font-size:.82rem; color:var(--text3); margin-bottom:32px }
+
+.apikey-bar { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:16px 20px; margin-bottom:24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; box-shadow:var(--sh-sm) }
+.apikey-tag { font-size:.65rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--text3); flex-shrink:0 }
+.apikey-input { flex:1; min-width:220px; padding:8px 12px; background:var(--bg); border:1.5px solid var(--border); border-radius:var(--rs); color:var(--text); font-family:'DM Mono',monospace; font-size:.75rem; outline:none; transition:var(--tr) }
+.apikey-input:focus { border-color:var(--gold) }
+.apikey-set { display:flex; align-items:center; gap:6px; font-size:.78rem; color:var(--ok); flex-shrink:0 }
+.apikey-set::before { content:'✓'; font-weight:700 }
+
+.prod-actions { display:flex; gap:10px; margin-bottom:28px; flex-wrap:wrap }
+
+.profiles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px }
+.profile-card {
+  background:var(--surface); border-radius:var(--r); box-shadow:var(--sh-sm);
+  border:1.5px solid var(--border); padding:22px 22px 18px;
+  cursor:pointer; transition:var(--tr); position:relative;
+}
+.profile-card:hover { border-color:var(--gold); box-shadow:var(--sh); transform:translateY(-2px) }
+.profile-card-accent { position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); border-radius:var(--r) var(--r) 0 0; transition:var(--tr) }
+.profile-card:hover .profile-card-accent { background:var(--gold) }
+.profile-card-name { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--text); margin-bottom:4px; padding-right:28px }
+.profile-card-meta { font-size:.72rem; color:var(--text3); margin-bottom:16px }
+.profile-card-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:10px }
+.profile-card-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold2)); border-radius:2px; transition:width .5s ease }
+.profile-card-stats { display:flex; gap:20px }
+.pstat { font-size:.7rem; color:var(--text3) }
+.pstat strong { color:var(--text2); font-weight:600 }
+.profile-del { position:absolute; top:14px; right:14px; width:26px; height:26px; border-radius:50%; border:1px solid transparent; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:var(--tr); color:var(--text3); font-size:.8rem; opacity:0 }
+.profile-card:hover .profile-del { opacity:1 }
+.profile-del:hover { background:#FEF0F0; border-color:#E0B0B0; color:#B05050 }
+.add-card { background:transparent; border:1.5px dashed var(--border-mid); border-radius:var(--r); padding:22px; cursor:pointer; transition:var(--tr); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:var(--text3); min-height:130px }
+.add-card:hover { border-color:var(--gold); color:var(--gold); background:var(--gold-pale) }
+.add-card-icon { font-size:1.8rem; opacity:.5 }
+.add-card-label { font-size:.82rem }
+
+/* ── PROFILE LAYOUT ── */
+.profile-shell { display:flex; height:calc(100dvh - 54px); overflow:hidden }
+.profile-side { width:230px; flex-shrink:0; background:var(--navy); overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--navy3) transparent; display:flex; flex-direction:column }
+.ps-top { padding:20px 18px 14px; border-bottom:1px solid rgba(255,255,255,.07) }
+.ps-name { font-family:'Playfair Display',serif; font-size:.95rem; color:#F8F6F2; margin-bottom:3px }
+.ps-dob { font-size:.65rem; color:rgba(255,255,255,.35) }
+.ps-prog-wrap { padding:12px 18px; border-bottom:1px solid rgba(255,255,255,.07) }
+.ps-prog-track { height:2px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; margin-bottom:5px }
+.ps-prog-fill { height:100%; background:var(--gold); border-radius:2px; transition:width .5s }
+.ps-prog-label { font-size:.6rem; color:rgba(255,255,255,.3); display:flex; justify-content:space-between }
+.ps-nav { flex:1; padding:8px 0 }
+.ps-item { display:flex; align-items:center; gap:9px; padding:8px 18px; cursor:pointer; transition:var(--tr); border-left:2px solid transparent }
+.ps-item:hover { background:rgba(255,255,255,.04) }
+.ps-item.active { background:rgba(200,149,106,.12); border-left-color:var(--gold) }
+.ps-item-num { font-family:'DM Mono',monospace; font-size:.58rem; color:rgba(255,255,255,.3); width:18px; flex-shrink:0 }
+.ps-item.active .ps-item-num { color:var(--gold) }
+.ps-item-label { font-size:.76rem; color:rgba(255,255,255,.55); flex:1; line-height:1.3 }
+.ps-item.active .ps-item-label { color:#F8F6F2 }
+.ps-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0 }
+.d-todo { background:rgba(255,255,255,.15) }
+.d-active { background:var(--gold); box-shadow:0 0 4px var(--gold) }
+.d-done { background:#5A9A6A }
+.ps-divider { height:1px; background:rgba(255,255,255,.07); margin:6px 18px }
+.ps-foot { padding:12px 16px; border-top:1px solid rgba(255,255,255,.07) }
+
+.profile-main { flex:1; background:var(--bg); overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent }
+
+/* ── PHASE VIEW ── */
+.phase-view { padding:28px 32px 60px; max-width:860px }
+.phase-kicker { font-size:.6rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); font-family:'DM Mono',monospace; margin-bottom:8px }
+.phase-title { font-family:'Playfair Display',serif; font-size:1.75rem; color:var(--text); margin-bottom:6px }
+.phase-desc-text { font-size:.82rem; color:var(--text2); line-height:1.65; max-width:560px; margin-bottom:24px }
+
+.phase-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap }
+.status-group { display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:3px }
+.spill { padding:4px 12px; border-radius:20px; border:none; font-size:.65rem; background:transparent; color:var(--text3); cursor:pointer; transition:var(--tr); font-family:'DM Sans',sans-serif; font-weight:500 }
+.spill:hover { background:var(--bg2) }
+.spill.s-todo.on { background:var(--surface); color:var(--text2); box-shadow:var(--sh-sm) }
+.spill.s-active.on { background:var(--warn-bg); color:var(--warn) }
+.spill.s-done.on { background:var(--ok-bg); color:var(--ok) }
+
+.btn-gen { display:inline-flex; align-items:center; gap:8px; padding:9px 20px; border-radius:var(--rs); background:var(--navy2); border:none; color:#F8F6F2; font-size:.78rem; font-weight:600; cursor:pointer; transition:var(--tr); font-family:'DM Sans',sans-serif; margin-left:auto }
+.btn-gen:hover:not(:disabled) { background:var(--navy3); transform:translateY(-1px); box-shadow:0 4px 16px rgba(26,46,68,.25) }
+.btn-gen:disabled { opacity:.45; cursor:default }
+.btn-gen svg { width:14px; height:14px }
+
+.card { background:var(--surface); border-radius:var(--r); box-shadow:var(--sh-sm); overflow:hidden; margin-bottom:16px; border:1px solid var(--border) }
+.card-head { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border); background:var(--bg) }
+.card-label { font-size:.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--text3) }
+.card-actions { display:flex; gap:6px }
+
+.prompt-pre { padding:16px 18px; font-family:'DM Mono',monospace; font-size:.7rem; line-height:1.8; color:var(--text2); white-space:pre-wrap; max-height:280px; overflow-y:auto; scrollbar-width:thin; background:var(--bg) }
+
+.gen-area { width:100%; min-height:200px; padding:16px 18px; background:var(--surface); border:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.83rem; line-height:1.75; resize:vertical; outline:none }
+.gen-area::placeholder { color:var(--text3) }
+.gen-area.streaming { background:var(--navy-soft) }
+
+.notes-area { width:100%; min-height:80px; padding:14px 16px; background:var(--surface); border:none; color:var(--text3); font-family:'DM Sans',sans-serif; font-size:.78rem; line-height:1.6; resize:vertical; outline:none }
+.notes-area:focus { color:var(--text2) }
+
+.phase-nav { display:flex; align-items:center; justify-content:space-between; margin-top:20px }
+
+/* ── ASSEMBLY ── */
+.assembly-view { padding:28px 32px 60px; max-width:760px }
+.assembly-status { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:24px }
+.ast-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--rs); padding:14px 16px; box-shadow:var(--sh-sm) }
+.ast-num { font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--gold); line-height:1 }
+.ast-label { font-size:.68rem; color:var(--text3); margin-top:2px }
+.assembly-phases { background:var(--surface); border-radius:var(--r); border:1px solid var(--border); overflow:hidden; margin-bottom:24px; box-shadow:var(--sh-sm) }
+.aph-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border) }
+.aph-item:last-child { border-bottom:none }
+.aph-num { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--text3); width:20px }
+.aph-title { font-size:.8rem; color:var(--text2); flex:1 }
+.aph-badge { font-size:.62rem; padding:3px 10px; border-radius:10px; font-weight:500 }
+.aph-ok { background:var(--ok-bg); color:var(--ok) }
+.aph-miss { background:var(--bg); color:var(--text3); border:1px solid var(--border) }
+.assembly-actions { display:flex; gap:12px; flex-wrap:wrap }
+.btn-assemble { display:inline-flex; align-items:center; gap:10px; padding:14px 28px; background:linear-gradient(135deg,var(--navy2),var(--navy3)); color:#F8F6F2; border:none; border-radius:var(--r); font-size:.9rem; font-weight:600; cursor:pointer; transition:var(--tr); font-family:'DM Sans',sans-serif; box-shadow:0 4px 16px rgba(26,46,68,.2) }
+.btn-assemble:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(26,46,68,.3) }
+.btn-assemble:disabled { opacity:.4; cursor:default; transform:none }
+.btn-download { display:inline-flex; align-items:center; gap:8px; padding:12px 24px; background:var(--gold); color:var(--navy); border:none; border-radius:var(--r); font-size:.85rem; font-weight:600; cursor:pointer; transition:var(--tr); font-family:'DM Sans',sans-serif }
+.btn-download:hover { background:var(--gold2); transform:translateY(-1px) }
+.assembly-output { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; margin-top:20px; box-shadow:var(--sh-sm) }
+
+/* ── CHECKLIST ── */
+.check-view { padding:28px 32px 60px; max-width:680px }
+.check-list { background:var(--surface); border-radius:var(--r); box-shadow:var(--sh-sm); overflow:hidden; margin-bottom:20px; border:1px solid var(--border) }
+.ci { display:flex; align-items:flex-start; gap:12px; padding:14px 18px; border-bottom:1px solid var(--border); cursor:pointer; transition:var(--tr) }
+.ci:last-child { border-bottom:none }
+.ci:hover { background:var(--bg) }
+.ci.on { background:var(--ok-bg) }
+.ci-box { width:20px; height:20px; border-radius:5px; border:1.5px solid var(--border-mid); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:var(--tr); background:var(--surface) }
+.ci.on .ci-box { background:var(--ok); border-color:var(--ok) }
+.ci-box svg { display:none; width:10px; height:10px }
+.ci.on .ci-box svg { display:block }
+.ci-n { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--text3); width:20px; flex-shrink:0; margin-top:3px }
+.ci-t { font-size:.82rem; color:var(--text2); line-height:1.5 }
+.ci.on .ci-t { color:var(--text3); text-decoration:line-through; text-decoration-color:rgba(61,122,85,.4) }
+.check-result { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:24px; text-align:center; box-shadow:var(--sh-sm) }
+.cr-n { font-family:'Playfair Display',serif; font-size:3rem; color:var(--gold); line-height:1; margin-bottom:6px }
+.cr-l { font-size:.72rem; color:var(--text3); margin-bottom:14px }
+.cr-b { display:inline-block; padding:8px 22px; border-radius:20px; font-size:.75rem; font-weight:600 }
+.cr-ok { background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok) }
+.cr-nok { background:var(--gold-pale); color:var(--gold); border:1px solid var(--gold-border) }
+
+/* ── MODAL ── */
+.moverlay { position:fixed; inset:0; background:rgba(26,46,68,.5); z-index:200; display:flex; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(4px) }
+.modal { background:var(--surface); border-radius:var(--r); padding:28px 32px; max-width:460px; width:100%; box-shadow:var(--sh-lg); border:1px solid var(--border) }
+.modal-title { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); margin-bottom:6px }
+.modal-desc { font-size:.8rem; color:var(--text2); line-height:1.6; margin-bottom:22px }
+.modal-field { margin-bottom:14px }
+.modal-label { font-size:.65rem; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); margin-bottom:6px; display:block }
+.modal-input { width:100%; padding:9px 13px; background:var(--bg); border:1.5px solid var(--border); border-radius:var(--rs); color:var(--text); font-family:'DM Sans',sans-serif; font-size:.85rem; outline:none; transition:var(--tr) }
+.modal-input:focus { border-color:var(--gold) }
+.modal-input.mono { font-family:'DM Mono',monospace; font-size:.72rem }
+textarea.modal-input { min-height:120px; resize:vertical; line-height:1.6 }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:22px }
+
+/* ── TOAST ── */
+#toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--navy); color:#F8F6F2; border-radius:24px; padding:10px 22px; font-size:.78rem; z-index:500; opacity:0; transition:all .25s ease; pointer-events:none; white-space:nowrap; box-shadow:var(--sh-lg) }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0) }
+#toast.ok { background:var(--ok) }
+#toast.err { background:#B05050 }
+
+/* ── SPINNER ── */
+.spin { width:14px; height:14px; border:2px solid rgba(255,255,255,.25); border-top-color:#fff; border-radius:50%; animation:rot .7s linear infinite }
+@keyframes rot { to { transform:rotate(360deg) } }
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px) {
+  .wg2, .wg3 { grid-template-columns:1fr }
+  .wizard-body { padding:24px 14px 80px }
+  .wsec-body { padding:18px 16px }
+  .profile-side { display:none }
+  .phase-view, .check-view, .assembly-view { padding:20px 16px 60px }
+  .prod-page { padding:24px 16px 80px }
+  .landing-hero { padding:60px 24px }
+  .topbar { padding:0 16px }
+  .assembly-status { grid-template-columns:1fr 1fr }
+  .wrad-grid { grid-template-columns:1fr }
+}
+@media(max-width:480px) {
+  .profiles-grid { grid-template-columns:1fr }
+  .wiz-sections { gap:2px }
+  .wiz-sec-btn { width:28px; height:28px; font-size:.65rem }
+  .wiz-progress-wrap { display:none }
+}
+
+.lang-toggle{display:flex;background:rgba(255,255,255,.08);border-radius:20px;padding:2px;gap:2px;border:1px solid rgba(255,255,255,.1)}
+.lang-btn{padding:4px 10px;border-radius:16px;border:none;background:transparent;color:rgba(255,255,255,.38);font-size:.63rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;letter-spacing:.05em}
+.lang-btn.active{background:#C8956A;color:#0A1520}
+.levels-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-top:24px;box-shadow:var(--sh-sm)}
+.levels-title{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.levels-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.level-card{border:1.5px solid var(--border);border-radius:var(--rs);padding:12px 10px;cursor:pointer;transition:var(--tr);text-align:center;position:relative;background:var(--surface)}
+.level-card.active{border-color:var(--gold);background:var(--gold-pale)}
+.level-card.disabled{opacity:.4;cursor:not-allowed}
+.level-card.recommended::after{content:'★';position:absolute;top:-8px;right:6px;background:var(--gold);color:var(--navy);font-size:.5rem;padding:2px 5px;border-radius:8px;font-weight:700}
+.level-num{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);line-height:1;margin-bottom:3px}
+.level-label{font-size:.68rem;font-weight:600;color:var(--text);margin-bottom:2px}.level-name{font-size:.76rem;font-weight:700;color:var(--text);margin-bottom:1px}.level-sub{font-size:.58rem;color:var(--text3);font-style:italic;margin-bottom:4px}
+.level-desc{font-size:.58rem;color:var(--text3);line-height:1.35}
+.level-tag{display:inline-block;margin-top:5px;padding:2px 7px;border-radius:8px;font-size:.55rem;font-weight:600}
+.tag-free{background:#EBF5EF;color:#3D7A55}
+.tag-paid{background:#FEF8E7;color:#8B6914}
+.tag-active{background:#E8EDF3;color:#1A2E44}
+.tag-soon{background:#F0EDE8;color:#7A8A98}
+.resume-banner{margin-top:20px;border-radius:var(--rs);padding:14px 18px;max-width:480px;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.rb-green{background:rgba(90,138,106,.12);border:1px solid rgba(90,138,106,.3)}
+.rb-gold{background:rgba(200,149,106,.1);border:1px solid rgba(200,149,106,.25)}
+.rb-title{font-size:.68rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.rb-sub{font-size:.74rem;color:rgba(248,246,242,.6)}
+.rb-green .rb-title{color:#5A9A6A}
+.rb-gold .rb-title{color:var(--gold)}
+.account-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--sh-sm)}
+.account-code{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--text2);background:var(--bg);padding:6px 12px;border-radius:var(--rs);border:1px solid var(--border);cursor:pointer;transition:var(--tr)}
+.account-code:hover{border-color:var(--gold)}
+@media(max-width:600px){.levels-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── LANG SELECT ── */
+.lang-select{appearance:none;-webkit-appearance:none;background:rgba(255,255,255,.08) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='rgba(255,255,255,.4)'/%3E%3C/svg%3E") no-repeat right 8px center;border:1px solid rgba(255,255,255,.1);border-radius:20px;color:rgba(255,255,255,.75);font-size:.63rem;font-weight:600;padding:5px 24px 5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.05em;outline:none;transition:all .2s}
+.lang-select:hover{border-color:rgba(200,149,106,.4);color:#F8F6F2}
+.lang-select option{background:#0D1C2B;color:#F8F6F2}
+
+/* ── LEVEL NAMES ── */
+.level-name{font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:1px}
+.level-sub{font-size:.58rem;color:var(--text3);font-style:italic;margin-bottom:4px}
+
+/* ── COMPARISON TABLE ── */
+.compare-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-top:16px;box-shadow:var(--sh-sm)}
+.compare-title{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.compare-table{width:100%;border-collapse:collapse;font-size:.72rem}
+.compare-table th{background:var(--bg);color:var(--text3);font-size:.58rem;letter-spacing:2px;text-transform:uppercase;padding:8px 10px;border:1px solid var(--border);text-align:center}
+.compare-table th:first-child{text-align:left}
+.compare-table td{padding:8px 10px;border:1px solid var(--border);text-align:center;color:var(--text2);font-size:.72rem}
+.compare-table td:first-child{text-align:left;color:var(--text3);font-size:.68rem}
+.compare-table tr:nth-child(even) td{background:var(--bg)}
+.ct-check{color:var(--ok);font-weight:700}
+.ct-dash{color:var(--border-mid)}
+.ct-n{font-weight:600;color:var(--text)}
+@media(max-width:480px){.compare-table{font-size:.6rem}.compare-table th,.compare-table td{padding:5px 6px}}
+
+/* ── N4 AXES ── */
+.axes-page{max-width:600px;margin:0 auto;padding:48px 24px 80px}
+.axes-title{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--text);margin-bottom:8px}
+.axes-sub{font-size:.85rem;color:var(--text2);line-height:1.65;margin-bottom:28px}
+.axes-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px}
+.axis-card{border:1.5px solid var(--border);border-radius:var(--rs);padding:12px 14px;cursor:pointer;transition:var(--tr);user-select:none;display:flex;align-items:flex-start;gap:10px;background:var(--surface)}
+.axis-card:hover{border-color:var(--gold);background:var(--gold-pale)}
+.axis-card.on{border-color:var(--gold);background:var(--gold-pale)}
+.axis-card.disabled-max{opacity:.45;cursor:not-allowed}
+.axis-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-mid);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:var(--tr);background:var(--surface)}
+.axis-card.on .axis-check{background:var(--gold);border-color:var(--gold)}
+.axis-check svg{display:none;width:10px;height:10px}
+.axis-card.on .axis-check svg{display:block}
+.axis-label{font-size:.78rem;color:var(--text2);line-height:1.4}
+.axis-card.on .axis-label{color:var(--navy2);font-weight:500}
+.axes-counter{font-size:.75rem;color:var(--text3);margin-bottom:16px}
+.axes-counter strong{color:var(--gold)}
+.axes-footer{display:flex;align-items:center;justify-content:space-between}
+@media(max-width:700px){.axes-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast"></div>
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATA — PHASES V5
+// ══════════════════════════════════════════════════════════════
+
+const PHASES = [
+  { id:1, title:'Posture & Identité', sub:'Cadrage · Règles invariables', maxT:800,
+    prompt:`Tu vas produire une Note de Synthèse personnalisée FYM (FreeYourMind).
+
+Ce document n'est pas un portrait psychologique. Ce n'est pas un bilan de développement personnel. Ce n'est pas un programme de transformation.
+
+C'est le résultat du croisement de 12 approches indépendantes appliquées à une seule personne. Ce croisement révèle les structures sous-jacentes de la personnalité — ce qui s'est construit, ce qui résiste, ce qui est déjà en mouvement.
+
+CE DOCUMENT NE FAIT PAS : — Il ne dit pas qui vous êtes — Il ne dit pas qui vous devriez être — Il ne propose pas d'axes de croissance — Il ne valide pas, n'encourage pas, ne console pas — Il ne répète pas le même point sous des angles différents
+
+CE DOCUMENT FAIT : Il montre comment la structure identitaire s'est construite dans le temps. Il nomme les mécaniques qui tournent automatiquement. Il identifie les tensions actives et les ressources réelles.
+
+DESTINATION : Provoquer un léger vertige de reconnaissance — pas de la satisfaction flatteuse. "comment tu sais ça ?" avec inconfort = réussi. "C'est tellement moi !" avec satisfaction = raté.
+
+RÈGLE ABSOLUE — AUCUNE RÉFÉRENCE EXTÉRIEURE AU PROFIL : Ce document ne fait jamais référence à son créateur, à l'architecte du projet, à l'équipe FYM, ni à aucune personne autre que celle dont le questionnaire a été traité.
+
+RÈGLES : Vouvoiement. Voix d'un sage. Pas de jargon spirituel. 3500-4500 mots pour les 4 actes + prologue. Pas de listes à puces dans le corps narratif. Référence à l'âge réel.
+
+INTERDIT : "votre potentiel" / "vous méritez" / "il est temps de" / "belle âme" / jargon spirituel / clichés de développement personnel / paternalisme / référence à l'éveil / citations de figures spirituelles / référence au créateur ou à la méthodologie FYM
+
+RÈGLE CITATIONS : Une seule citation par note. Auteur inattendu. Jamais une figure spirituelle. Juste avant ou après le retournement.
+
+Confirme que tu as compris et attends la Phase 2.
+
+PHASE 1 TERMINÉE`},
+
+  { id:2, title:'Questionnaire & Calculs', sub:'12 approches · 7 tensions', maxT:4000,
+    prompt:`Voici le questionnaire rempli de la personne :
+
+[QUESTIONNAIRE_DATA]
+
+Effectue les deux calculs suivants :
+
+CALCUL 1 — HUMAN DESIGN & GENE KEYS : Type · Profil · Autorité · Définition · Canaux · Portes · Gene Keys (Ombre–Don–Siddhi, 4 sphères)
+CALCUL 2 — BAZI : Day Master · 4 piliers · éléments · carences · 10 cycles décennaux
+
+Pour les 10 autres approches depuis les données du questionnaire :
+— Thème astral / Astrologie karmique / Dashas védiques / Astrocartographie / Année personnelle
+— Ennéagramme (Type, Aile, Sous-type, Niveau) — depuis réponses brutes
+— SCT Loevinger (niveau 1-7) — depuis complétions de phrases
+— Auto-observation (faible/partiel/actif/stable) / Individuation (réactive/intellectuelle/incarnée/engagée) / Ego dominant (défensif/performatif/spiritualisé/dissocié)
+— Psychogénéalogie — depuis données de lignée
+
+Puis identifie les 7 tensions structurelles majeures issues du croisement des 12 approches.
+
+Présente sous forme structurée. N'invite pas à valider. N'annonce pas la rédaction.
+
+PHASE 2 TERMINÉE`},
+
+  { id:3, title:'Prologue & Acte I', sub:'Ce qui lit ces lignes · Ce qui a été reçu', maxT:8000,
+    prompt:`Rédige le Prologue et l'Acte I.
+
+PROLOGUE — "Ce qui lit ces lignes" : Adresse directe à la personne concrète — âge réel, date de naissance, faits biographiques bruts. Tableau de calibrage : SCT Loevinger · Ego dominant · Auto-observation · Individuation.
+
+ACTE I — "Ce qui a été reçu" / Sous-titre : "Ce que vous n'avez pas choisi"
+Sources : Psychogénéalogie · Gene Keys ombre · Astrologie karmique · BaZi socle · événements précoces
+Ton : impersonnel, factuel, anthropologique. Pas de consolation.
+
+Produis :
+1. Paragraphe narratif d'entrée ("Avant que vous ayez un prénom, il y avait déjà quelque chose.")
+2. Tableau Tensions/Atouts Couche 1 — minimum 5 lignes. Les deux colonnes sont vraies en même temps.
+3. Phrase de transition vers l'Acte II.
+
+PHASE 3 TERMINÉE`},
+
+  { id:4, title:'Acte II & Acte III', sub:'Mécaniques automatiques · Programmation consciente', maxT:8000,
+    prompt:`ACTE II — "Ce que ça a coûté et produit" / "Les mécaniques qui tournent toutes seules"
+Sources : HD · Ennéagramme · Thème astral · Dashas formatrices
+
+Produis :
+1. Paragraphe narratif d'entrée.
+2. Tableau croisé Tensions/Atouts Couche 2 — minimum 5 lignes.
+3. Tableau "La Mécanique Centrale" — forces en sens opposés — minimum 5 forces.
+4. Croisements inédits — minimum 5.
+5. Le retournement — sans titre, sans signal, une seule fois, 150 mots max.
+
+ACTE III — "Ce que vous en faites" / "La programmation consciente — et les territoires où elle se joue"
+Sources : HD × Ennéagramme × résistances × patterns × SCT × ego dominant
+
+Produis :
+1. Paragraphe narratif d'entrée.
+2. Tableau Tensions/Atouts Couche 3 — minimum 4 lignes.
+3. Tableau "Ce qui freine et ce qui libère" : Stratégie · Ce qu'elle protège · Ce qu'elle coûte · Le déplacement possible. Minimum 5 lignes.
+4. Les 7 Territoires — titre · 2-3 paragraphes · bloc "Ce qui est possible" (instruction concrète, pas une invitation).
+Territoires : Les Rôles · Le Vide Fertile · Les Miroirs · Les Ressources · Les Pertes · La Traversée · L'Appel
+
+PHASE 4 TERMINÉE`},
+
+  { id:5, title:'Acte IV', sub:'Le moment · Le lieu · Ce qui devient possible', maxT:8000,
+    prompt:`ACTE IV — "Le moment précis. Le lieu exact. Ce que ça rend possible maintenant."
+Sources : Dashas · Transits · Année personnelle · Astrocartographie · inscription corporelle
+
+Produis :
+1. Paragraphe d'entrée ("Les trois actes précédents décrivent votre architecture. Cet acte est différent.")
+2. Tableau "Le Moment" — minimum 4 lignes.
+3. Tableau "Le Lieu" — astrocartographie — tous lieux significatifs.
+4. Tableau "Fenêtres d'action" — 3 périodes sur 24 mois.
+5. Paragraphe "Le Corps comme information".
+6. Paragraphe "Ce qui est déjà en mouvement" — observation factuelle.
+
+ACTE IV SUITE — "Ce qui se fait quand rien ne monopolise l'attention"
+TEMPS 1 — Bilan empirique : avec les mots exacts de la personne. Factuel et inévitable.
+TEMPS 2 — La mécanique peur/désir : nommer comme mécaniques. Montrer que le combat les renforce. INTERDIT : "laissez passer" / "observez" / "restez présent"
+TEMPS 3 — Pointeur calibré : fort pilotage → koan / pilotage moyen → observation du gap / faible → question concrète récente
+
+CLÔTURE INVARIABLE :
+"Ce qui crée en vous ne vous a jamais demandé la permission.
+Il a toujours su où était le souffle."
+
+PHASE 5 TERMINÉE`},
+
+  { id:'6a', title:'Tribu — Soumission', sub:'14 propositions · Attente validation', maxT:3000,
+    prompt:`Identifier les 7 mécaniques les plus actives. Proposer :
+
+LES AMIS QUI VOUS COÛTENT CHER — 7 propositions :
+| # | Source système | Nom proposé | Punch line proposée |
+
+LES VRAIS AMIS — 7 contreparties :
+| # | Contrepartie de | Nom proposé | Punch line proposée |
+
+RÈGLES NOMS : Inventif, mémorable, spécifique. Jamais recyclé. Vrai ami = même silhouette, direction opposée.
+RÈGLES PUNCH LINES : Voix intérieure · personnage se trahit · rythme retourne l'argument · lecteur reconnaît ET sourit.
+SYMÉTRIE : punchline vrai ami #1 répond structurellement à la punchline cher ami #1.
+
+Affiche uniquement les deux tableaux. Aucun commentaire après.
+
+PHASE 6 — SOUMISSION TERMINÉE · EN ATTENTE VALIDATION`},
+
+  { id:'6b', title:'Tribu — Rédaction', sub:'14 portraits complets · Cercle SVG', maxT:8000,
+    prompt:`Les noms et punch lines ayant été validés, rédige le chapitre complet.
+
+PARTIE 1 — LES AMIS QUI VOUS COÛTENT CHER : Introduction (2-3 phrases ironiques). Pour chacun des 7 : Numéro · Source · Nom · Sous-titre (3 mots-clés) · Portrait (3-4 paragraphes scène concrète) · Sa mécanique · Punch line en italique.
+
+PARTIE 2 — LES VRAIS AMIS : même structure, direction opposée.
+
+PARTIE 3 — SYNTHÈSE RÉDIGÉE : 200-250 mots. Question : à qui est le micro, là, maintenant ?
+
+CERCLE DE LA TRIBU — SVG : cercle tracé, 14 noms en ronde. 7 "chers amis" moitié supérieure (#1A2E44). 7 "vrais amis" moitié inférieure (#C8956A). Nom gras + punch line italique orientés tangentiellement. Aucun visuel de personnage.
+
+PHASE 6 TERMINÉE`},
+
+  { id:7, title:'Annexe, Miroir & Clôture', sub:'6 tableaux · Miroir · Texte final', maxT:6000,
+    prompt:`ANNEXE PRATIQUE :
+Introduction : "Ce qui suit n'est pas un programme de développement personnel. Ce sont des conditions concrètes..."
+
+Tableaux :
+A — Activités physiques : Activité · Fréquence · Pourquoi ce profil
+B — Activités créatives : Activité · Format · Pourquoi · Comment démarrer
+C — Activités culturelles : Domaine · Exemples · Effet
+D — Régime alimentaire : Orientation · Aliments/Pratique · Justification
+E — Rythme quotidien : Heure · Pratique · Durée · Pourquoi
+F — Rituels de vigilance situationnelle : Situation · Ce qui se passe · Le rituel
+
+MIROIR FINAL : Ce que ce lecteur va probablement faire avec ce document — ses mécaniques spécifiques. Puis : une seule chose concrète juste. INTERDIT : "votre potentiel".
+
+CLÔTURE INVARIABLE :
+"Imprimez ce document. Rangez-le quelque part de concret — pas dans un dossier numérique.
+
+Dans six mois, un an, relisez une section au hasard. Pas pour mesurer vos progrès. Pour vous rappeler ce qui est là, sous le bruit. Ce document ne vieillit pas. Vous non plus, à cet endroit-là."
+
+En italique : "La créativité ne se libère pas. Elle se révèle."
+
+Rien après cette ligne. Pas un mot.
+
+PHASE 7 TERMINÉE`},
+
+  { id:8, title:'Page Signature', sub:'Fond navy · Or · Page blanche', maxT:300,
+    prompt:`Page signature UNIQUEMENT EN FIN DE DOCUMENT :
+Fond #1A2E44. Centré verticalement. Ligne 1 : FREE YOUR MIND (#8C9DAD, petit, espacé). Filet or (#C8956A) 8cm centré au-dessus et en-dessous. Ligne 2 : "Vous n'êtes pas le créateur." (blanc, gras, grand). Ligne 3 : "Vous êtes la création." (or #C8956A, gras, grand).
+Suivi d'une page blanche intentionnelle.
+
+PHASE 8 TERMINÉE`}
+];
+
+const CHECKLIST = [
+  'Chaque paragraphe narratif est-il injustifiable pour quelqu\'un d\'autre que ce profil ?',
+  'L\'Acte II surprend-il le lecteur — ou se contente-t-il de décrire ?',
+  'Le retournement arrive-t-il une seule fois, sans signal, en 150 mots maximum ?',
+  'Y a-t-il un seul mot d\'encouragement, de validation ou de compassion performative ?',
+  'Les 7 territoires se terminent-ils tous par une instruction concrète — pas une invitation ?',
+  'Les 14 personnages sont-ils entièrement originaux — aucun recyclé d\'un autre profil ?',
+  'Chaque ligne des préconisations est-elle justifiée par au moins un système du profil ?',
+  'La clôture se termine-t-elle exactement sur la signature — rien après ?',
+  'L\'Acte IV Suite est-il empirique et personnel — zéro référence spirituelle, zéro prescription ?',
+  'Les noms et punch lines des personnages ont-ils été validés avant rédaction ?',
+  'Le document ne contient-il aucune référence à son créateur, à l\'architecte ou à la méthodologie FYM ?'
+];
+
+const Q_STEPS = [
+  { id:'A', letter:'A',
+    fr:{ title:'Identité & biographie', intro:'Ces données sont la base de votre étude.' },
+    en:{ title:'Identity & Biography', intro:'This data is the foundation of your study.' }
+  },
+  { id:'B', letter:'B',
+    fr:{ title:'Lignée & psychogénéalogie', intro:'Héritages énergétiques, culturels et familiaux.' },
+    en:{ title:'Lineage & Psychogenealogy', intro:'Energetic, cultural and family inheritances.' }
+  },
+  { id:'C', letter:'C',
+    fr:{ title:"Processus d'éveil", intro:'Soyez aussi concret que possible.' },
+    en:{ title:'Awakening Process', intro:'Be as concrete as possible.' }
+  },
+  { id:'D', letter:'D',
+    fr:{ title:'Ennéagramme', intro:'Répondez spontanément, sans chercher à identifier votre type.' },
+    en:{ title:'Enneagram', intro:'Answer spontaneously, without trying to identify your type.' }
+  },
+  { id:'E', letter:'E',
+    fr:{ title:'SCT Loevinger', intro:'Complétez ces phrases spontanément, sans chercher la cohérence.' },
+    en:{ title:'SCT Loevinger', intro:'Complete these sentences spontaneously, without looking for coherence.' }
+  },
+  { id:'F', letter:'F',
+    fr:{ title:'Auto-observation', intro:"Q1–Q7 : la réponse la plus honnête, pas la plus flatteuse." },
+    en:{ title:'Self-Observation', intro:'Q1–Q7: the most honest answer, not the most flattering.' }
+  }
+];
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+
+let LANG = 'fr';
+let SELECTED_AXES = [];
+let S = { apiKey:'', profiles:[] };
+let QD = {};
+let QSTEP = 0;
+let CUR_PROFILE = null;
+let CUR_PHASE = 1;
+let GENERATING = false;
+let STOP_GEN = false;
+let CUR_READER = null;
+
+function loadState() {
+  try {
+    const d = JSON.parse(localStorage.getItem('fym3')||'{}');
+    S.apiKey = d.apiKey||''; S.profiles = d.profiles||[];
+  } catch(e){}
+  try { QD = JSON.parse(localStorage.getItem('fym3_q')||'{}'); } catch(e){}
+  try { SELECTED_AXES = JSON.parse(localStorage.getItem('fym3_axes')||'[]'); } catch(e){}
+  LANG = localStorage.getItem('fym_lang') || (navigator.language||'fr').slice(0,2);
+  if(!UI[LANG]) LANG = 'fr';
+}
+function saveAxes() { localStorage.setItem('fym3_axes', JSON.stringify(SELECTED_AXES)); }
+function setLang(l) {
+  LANG = l;
+  localStorage.setItem('fym_lang', l);
+  document.documentElement.lang = l;
+  route(location.hash||'');
+}
+function save() { localStorage.setItem('fym3', JSON.stringify(S)); }
+function saveQ() { localStorage.setItem('fym3_q', JSON.stringify(QD)); }
+function clearQ() { QD={}; localStorage.removeItem('fym3_q'); }
+
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function el(id) { return document.getElementById(id); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg, type='') {
+  const t=el('toast'); t.textContent=msg; t.className=type?`show ${type}`:'show';
+  setTimeout(()=>t.className='',2400);
+}
+function copyText(txt) {
+  if (!txt){toast('Rien à copier');return;}
+  navigator.clipboard.writeText(txt).then(()=>toast('✓ Copié','ok')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('✓ Copié','ok');
+  });
+}
+
+function getProfile(id) { return S.profiles.find(p=>p.id===id); }
+function phasePct(p) {
+  const done=PHASES.filter(ph=>p.phases?.[ph.id]?.status==='done').length;
+  return Math.round(done/PHASES.length*100);
+}
+function go(h) { location.hash=h; }
+
+// ══════════════════════════════════════════════════════════════
+// ROUTER
+// ══════════════════════════════════════════════════════════════
+
+function route(hash) {
+  const h=(hash||'').replace('#','');
+  if (!h||h==='landing') { renderLanding(); return; }
+  if (h==='questionnaire'||h.startsWith('questionnaire/')) {
+    const step=parseInt(h.split('/')[1])||0;
+    QSTEP=step; renderQuestionnaire(); return;
+  }
+  if (h==='n4-axes') { renderN4Axes(); return; }
+  if (h==='merci') {
+    if (!QD || Object.keys(QD).length === 0) {
+      try { QD = JSON.parse(localStorage.getItem('fym3_q')||'{}'); } catch(e) {}
+    }
+    renderSuccess(); return;
+  }
+  if (h==='production') { renderProduction(); return; }
+  if (h.startsWith('profile/')) {
+    const parts=h.split('/');
+    CUR_PROFILE=parts[1];
+    CUR_PHASE=parts[3]||PHASES[0].id;
+    renderProfile(); return;
+  }
+  if (h.startsWith('import/')) { importCode(h.slice(7),true); return; }
+  renderLanding();
+}
+
+window.addEventListener('hashchange',()=>route(location.hash));
+
+// ══════════════════════════════════════════════════════════════
+// TOPBAR
+// ══════════════════════════════════════════════════════════════
+
+// switchLang replaced by setLang
+
+function TB(crumb='', actions='') {
+  const langSel = `<select class="lang-select" onchange="setLang(this.value)">
+    ${['fr','en','de','es','it','ru'].map(l=>`<option value="${l}" ${LANG===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}
+  </select>`;
+  return `<div class="topbar">
+    <div class="tb-logo" onclick="go('')">Free<span>YourMind</span></div>
+    ${crumb?`<div class="tb-sep"></div><div class="tb-breadcrumb">${crumb}</div>`:''}
+    <div class="tb-actions">${actions}${langSel}</div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// LANDING
+// ══════════════════════════════════════════════════════════════
+
+// ── UI STRINGS ──
+const UI = {
+  fr: {
+    title:'Ce qui vous constitue',
+    sub:'12 approches indépendantes. Un individu unique. Une cartographie précise des structures sous-jacentes de la personnalité.',
+    begin:'Commencer', prod_btn:'Espace production',
+    levels_title:'Choisissez votre niveau',
+    compare_title:'Tableau comparatif',
+    compare_rows:['Questionnaire','Approches','Longueur','Tensions','Annexe pratique','Axes spécifiques'],
+    compare_vals:[['✓','✓','✓','✓'],['3','6','12','12+'],['~800 mots','~2 000 mots','3 500–4 500','Sur mesure'],['—','3','7','7+'],['—','—','✓','✓'],['—','—','—','✓']],
+    tag_free:'Gratuit', tag_paid:'Payant', tag_test:'En test', tag_deploy:'Déploiement',
+    resume_done:'✓ Questionnaire complété', resume_done_sub:'Vos réponses sont sauvegardées', resume_done_btn:'Retrouver mon code →',
+    resume_prog:'Questionnaire en cours', resume_prog_sub:'Vos réponses sont sauvegardées', resume_btn:'Reprendre →',
+    restart:'Recommencer', confirm_restart:'Recommencer depuis le début ?',
+    tagline:'« La créativité ne se libère pas. Elle se révèle. »',
+    axes_title:'Choisissez vos axes complémentaires',
+    axes_sub:'Niveau Fusion — sélectionnez 2 à 4 axes d'analyse supplémentaires pour personnaliser votre étude.',
+    axes_selected:'axe(s) sélectionné(s)', axes_min:'Sélectionnez au moins 2 axes pour continuer.',
+    axes_continue:'Continuer →', axes_back:'← Retour',
+    sec_next:'Section suivante', sec_last:'Dernière section',
+    save:'Sauvegarder', saved:'Sauvegardé',
+    q_lang_notice:'',
+    home:'Accueil',
+    q_complete_title:'Questionnaire complet',
+    q_complete_sub:'Transmettez votre code de partage à votre consultant FYM — par email, message ou lien direct.',
+    share_code:'Code de partage', direct_link:'Lien direct',
+    copy_code:'Copier le code', copy_link:'Copier le lien',
+    edit_answers:'← Modifier mes réponses',
+    how_to:'Comment transmettre :',
+    how_body:'1. Copiez le code ci-dessus (ou le lien direct)<br>2. Envoyez-le par email ou message à votre consultant FYM<br>3. Il importera automatiquement vos données',
+    keep_code:'Conservez votre code — il contient toutes vos réponses.'
+  },
+  en: {
+    title:'What Constitutes You',
+    sub:'12 independent approaches. One unique individual. A precise mapping of underlying personality structures.',
+    begin:'Begin', prod_btn:'Production space',
+    levels_title:'Choose your level',
+    compare_title:'Comparison table',
+    compare_rows:['Questionnaire','Approaches','Length','Tensions','Practical appendix','Specific axes'],
+    compare_vals:[['✓','✓','✓','✓'],['3','6','12','12+'],['~800 words','~2,000 words','3,500–4,500','Custom'],['—','3','7','7+'],['—','—','✓','✓'],['—','—','—','✓']],
+    tag_free:'Free', tag_paid:'Paid', tag_test:'In testing', tag_deploy:'Deploying',
+    resume_done:'✓ Questionnaire complete', resume_done_sub:'Your answers are saved', resume_done_btn:'Retrieve my code →',
+    resume_prog:'Questionnaire in progress', resume_prog_sub:'Your answers are saved', resume_btn:'Resume →',
+    restart:'Restart', confirm_restart:'Start over from the beginning?',
+    tagline:'"Creativity is not gained, it is revealed."',
+    axes_title:'Choose your complementary axes',
+    axes_sub:'Fusion level — select 2 to 4 additional analysis axes to customise your study.',
+    axes_selected:'axis/axes selected', axes_min:'Select at least 2 axes to continue.',
+    axes_continue:'Continue →', axes_back:'← Back',
+    sec_next:'Next section', sec_last:'Last section',
+    save:'Save', saved:'Saved',
+    q_lang_notice:'',
+    home:'Home',
+    q_complete_title:'Questionnaire complete',
+    q_complete_sub:'Send your share code to your FYM consultant — by email, message or direct link.',
+    share_code:'Share code', direct_link:'Direct link',
+    copy_code:'Copy code', copy_link:'Copy link',
+    edit_answers:'← Edit my answers',
+    how_to:'How to send:',
+    how_body:'1. Copy the code above (or the direct link)<br>2. Send it by email or message to your FYM consultant<br>3. They will automatically import your data',
+    keep_code:'Keep your code — it contains all your answers.'
+  },
+  de: {
+    title:'Was Sie ausmacht',
+    sub:'12 unabhängige Ansätze. Ein einzigartiges Individuum. Eine präzise Kartierung der zugrundeliegenden Persönlichkeitsstrukturen.',
+    begin:'Beginnen', prod_btn:'Produktionsbereich',
+    levels_title:'Wählen Sie Ihr Niveau',
+    compare_title:'Vergleichstabelle',
+    compare_rows:['Fragebogen','Ansätze','Länge','Spannungen','Praktischer Anhang','Spez. Achsen'],
+    compare_vals:[['✓','✓','✓','✓'],['3','6','12','12+'],['~800 W.','~2.000 W.','3.500–4.500','Indiv.'],['—','3','7','7+'],['—','—','✓','✓'],['—','—','—','✓']],
+    tag_free:'Kostenlos', tag_paid:'Kostenpfl.', tag_test:'Im Test', tag_deploy:'Bereitst.',
+    resume_done:'✓ Fragebogen ausgefüllt', resume_done_sub:'Ihre Antworten sind gespeichert', resume_done_btn:'Meinen Code abrufen →',
+    resume_prog:'Fragebogen in Bearbeitung', resume_prog_sub:'Ihre Antworten sind gespeichert', resume_btn:'Fortsetzen →',
+    restart:'Neu starten', confirm_restart:'Von vorne beginnen?',
+    tagline:'„Kreativität wird nicht befreit. Sie enthüllt sich."',
+    axes_title:'Wählen Sie Ihre ergänzenden Achsen',
+    axes_sub:'Fusion-Niveau — wählen Sie 2 bis 4 zusätzliche Analyseachsen.',
+    axes_selected:'Achse(n) ausgewählt', axes_min:'Wählen Sie mindestens 2 Achsen aus.',
+    axes_continue:'Weiter →', axes_back:'← Zurück',
+    sec_next:'Nächster Abschnitt', sec_last:'Letzter Abschnitt',
+    save:'Speichern', saved:'Gespeichert',
+    q_lang_notice:'ℹ Der Fragebogen ist auf Englisch verfügbar.',
+    home:'Startseite',
+    q_complete_title:'Fragebogen vollständig',
+    q_complete_sub:'Senden Sie Ihren Freigabecode an Ihren FYM-Berater.',
+    share_code:'Freigabecode', direct_link:'Direktlink',
+    copy_code:'Code kopieren', copy_link:'Link kopieren',
+    edit_answers:'← Antworten bearbeiten',
+    how_to:'So übermitteln:', how_body:'1. Kopieren Sie den Code<br>2. Senden Sie ihn an Ihren FYM-Berater<br>3. Er importiert Ihre Daten automatisch',
+    keep_code:'Bewahren Sie Ihren Code auf.'
+  },
+  es: {
+    title:'Lo que le constituye',
+    sub:'12 enfoques independientes. Un individuo único. Una cartografía precisa de las estructuras subyacentes de la personalidad.',
+    begin:'Comenzar', prod_btn:'Espacio de producción',
+    levels_title:'Elija su nivel',
+    compare_title:'Tabla comparativa',
+    compare_rows:['Cuestionario','Enfoques','Longitud','Tensiones','Anexo práctico','Ejes espec.'],
+    compare_vals:[['✓','✓','✓','✓'],['3','6','12','12+'],['~800 pal.','~2.000 pal.','3.500–4.500','Personaliz.'],['—','3','7','7+'],['—','—','✓','✓'],['—','—','—','✓']],
+    tag_free:'Gratuito', tag_paid:'De pago', tag_test:'En prueba', tag_deploy:'Despliegue',
+    resume_done:'✓ Cuestionario completado', resume_done_sub:'Sus respuestas están guardadas', resume_done_btn:'Recuperar mi código →',
+    resume_prog:'Cuestionario en curso', resume_prog_sub:'Sus respuestas están guardadas', resume_btn:'Continuar →',
+    restart:'Reiniciar', confirm_restart:'¿Empezar desde el principio?',
+    tagline:'«La creatividad no se libera. Se revela.»',
+    axes_title:'Elija sus ejes complementarios',
+    axes_sub:'Nivel Fusión — seleccione 2 a 4 ejes de análisis adicionales.',
+    axes_selected:'eje(s) seleccionado(s)', axes_min:'Seleccione al menos 2 ejes.',
+    axes_continue:'Continuar →', axes_back:'← Volver',
+    sec_next:'Sección siguiente', sec_last:'Última sección',
+    save:'Guardar', saved:'Guardado',
+    q_lang_notice:'ℹ El cuestionario está disponible en inglés.',
+    home:'Inicio',
+    q_complete_title:'Cuestionario completo',
+    q_complete_sub:'Envíe su código a su consultor FYM.',
+    share_code:'Código', direct_link:'Enlace directo',
+    copy_code:'Copiar código', copy_link:'Copiar enlace',
+    edit_answers:'← Editar mis respuestas',
+    how_to:'Cómo enviar:', how_body:'1. Copie el código<br>2. Envíelo a su consultor FYM<br>3. Importará sus datos automáticamente',
+    keep_code:'Conserve su código.'
+  },
+  it: {
+    title:'Ciò che vi costituisce',
+    sub:'12 approcci indipendenti. Un individuo unico. Una cartografia precisa delle strutture sottostanti della personalità.',
+    begin:'Iniziare', prod_btn:'Spazio produzione',
+    levels_title:'Scegliete il vostro livello',
+    compare_title:'Tabella comparativa',
+    compare_rows:['Questionario','Approcci','Lunghezza','Tensioni','Appendice pratica','Assi spec.'],
+    compare_vals:[['✓','✓','✓','✓'],['3','6','12','12+'],['~800 par.','~2.000 par.','3.500–4.500','Su misura'],['—','3','7','7+'],['—','—','✓','✓'],['—','—','—','✓']],
+    tag_free:'Gratuito', tag_paid:'A pagamento', tag_test:'In prova', tag_deploy:'Distribuz.',
+    resume_done:'✓ Questionario completato', resume_done_sub:'Le vostre risposte sono salvate', resume_done_btn:'Recuperare il mio codice →',
+    resume_prog:'Questionario in corso', resume_prog_sub:'Le vostre risposte sono salvate', resume_btn:'Riprendere →',
+    restart:'Ricominciare', confirm_restart:"Ricominciare dall'inizio?",
+    tagline:'«La creatività non si libera. Si rivela.»',
+    axes_title:'Scegliete i vostri assi complementari',
+    axes_sub:'Livello Fusione — selezionate da 2 a 4 assi di analisi aggiuntivi.',
+    axes_selected:'asse/i selezionato/i', axes_min:'Selezionate almeno 2 assi.',
+    axes_continue:'Continuare →', axes_back:'← Indietro',
+    sec_next:'Sezione successiva', sec_last:'Ultima sezione',
+    save:'Salvare', saved:'Salvato',
+    q_lang_notice:'ℹ Il questionario è disponibile in inglese.',
+    home:'Inizio',
+    q_complete_title:'Questionario completo',
+    q_complete_sub:'Inviate il vostro codice al vostro consulente FYM.',
+    share_code:'Codice', direct_link:'Link diretto',
+    copy_code:'Copiare il codice', copy_link:'Copiare il link',
+    edit_answers:'← Modificare le mie risposte',
+    how_to:'Come inviare:', how_body:'1. Copiate il codice<br>2. Inviatelo al vostro consulente FYM<br>3. Importerà i vostri dati automaticamente',
+    keep_code:'Conservate il vostro codice.'
+  },
+  ru: {
+    title:'То, что вас составляет',
+    sub:'12 независимых подходов. Один уникальный человек. Точная карта базовых структур личности.',
+    begin:'Начать', prod_btn:'Производство',
+    levels_title:'Выберите ваш уровень',
+    compare_title:'Сравнительная таблица',
+    compare_rows:['Опросник','Подходы','Длина','Напряжения','Приложение','Спец. оси'],
+    compare_vals:[['✓','✓','✓','✓'],['3','6','12','12+'],['~800 сл.','~2000 сл.','3500–4500','Индивид.'],['—','3','7','7+'],['—','—','✓','✓'],['—','—','—','✓']],
+    tag_free:'Бесплатно', tag_paid:'Платно', tag_test:'Тест', tag_deploy:'Развёртыв.',
+    resume_done:'✓ Опросник завершён', resume_done_sub:'Ваши ответы сохранены', resume_done_btn:'Получить мой код →',
+    resume_prog:'Опросник в процессе', resume_prog_sub:'Ваши ответы сохранены', resume_btn:'Продолжить →',
+    restart:'Начать заново', confirm_restart:'Начать заново с самого начала?',
+    tagline:'«Творчество не освобождается. Оно раскрывается.»',
+    axes_title:'Выберите дополнительные оси',
+    axes_sub:'Уровень Слияние — выберите от 2 до 4 дополнительных осей анализа.',
+    axes_selected:'ось/осей выбрано', axes_min:'Выберите не менее 2 осей.',
+    axes_continue:'Продолжить →', axes_back:'← Назад',
+    sec_next:'Следующий раздел', sec_last:'Последний раздел',
+    save:'Сохранить', saved:'Сохранено',
+    q_lang_notice:'ℹ Опросник доступен на английском языке.',
+    home:'Главная',
+    q_complete_title:'Опросник завершён',
+    q_complete_sub:'Отправьте ваш код консультанту FYM.',
+    share_code:'Код доступа', direct_link:'Прямая ссылка',
+    copy_code:'Скопировать код', copy_link:'Скопировать ссылку',
+    edit_answers:'← Изменить ответы',
+    how_to:'Как отправить:', how_body:'1. Скопируйте код<br>2. Отправьте его консультанту FYM<br>3. Он автоматически импортирует данные',
+    keep_code:'Сохраните ваш код.'
+  }
+};
+
+// ── N4 AXES ──
+const N4_AXES = [
+  { id:'hd',         fr:'Human Design & Gene Keys — approfondissement',    en:'Human Design & Gene Keys — in depth' },
+  { id:'bazi',       fr:'Bazi — analyse détaillée des cycles',              en:'Bazi — detailed cycle analysis' },
+  { id:'karmique',   fr:'Astrologie karmique — nœuds & karma',              en:'Karmic astrology — nodes & karma' },
+  { id:'astrocarto', fr:'Astrocartographie — géographie de l'âme',         en:'Astrocartography — geography of the soul' },
+  { id:'dashas',     fr:'Dashas védiques — timeline précise',                en:'Vedic Dashas — precise timeline' },
+  { id:'ennea',      fr:'Ennéagramme — sous-types & niveaux',                en:'Enneagram — subtypes & levels' },
+  { id:'psychogen',  fr:'Psychogénéalogie — 3 générations',                 en:'Psychogenealogy — 3 generations' },
+  { id:'tribu',      fr:'Dynamiques relationnelles — tribu élargie',         en:'Relational dynamics — extended tribe' },
+  { id:'creativite', fr:'Créativité & expression — blocages spécifiques',    en:'Creativity & expression — specific blocks' },
+  { id:'corps',      fr:'Corps & santé — carte somatique',                   en:'Body & health — somatic map' },
+  { id:'finances',   fr:'Finances & abondance — structures de blocage',      en:'Finances & abundance — blocking structures' },
+  { id:'pro',        fr:'Vie professionnelle — visibilité & légitimité',      en:'Professional life — visibility & legitimacy' }
+];
+
+function u() { return UI[LANG] || UI.en; }
+
+// ── LEVELS ──
+let SELECTED_LEVEL = 3;
+const LEVELS = [
+  { n:1, name:'Étincelle', sub_fr:'première lecture',  sub_en:'first reading',   tag:'tag-free',   disabled:true  },
+  { n:2, name:'Flux',      sub_fr:'vision élargie',     sub_en:'broader view',    tag:'tag-paid',   disabled:true  },
+  { n:3, name:'Lumière',   sub_fr:'structure complète', sub_en:'full structure',  tag:'tag-active', disabled:false, recommended:true },
+  { n:4, name:'Fusion',    sub_fr:'lecture unique',      sub_en:'unique reading',  tag:'tag-soon',   disabled:false }
+];
+
+function getLevelsBarHTML() {
+  const title = LANG==='fr' ? 'Choisissez votre niveau' : 'Choose your level';
+  const cards = LEVELS.map(l => {
+    const label = LANG==='fr' ? l.fr : l.en;
+    const desc = LANG==='fr' ? l.fdesc : l.edesc;
+    const tag = LANG==='fr' ? l.ftag : l.etag;
+    const isActive = !l.disabled && SELECTED_LEVEL===l.n;
+    return `<div class="level-card ${l.disabled?'disabled':''} ${isActive?'active':''} ${l.recommended?'recommended':''}"
+      onclick="${l.disabled?'':('selectLevel('+l.n+')')}">
+      <div class="level-num">N${l.n}</div>
+      <div class="level-label">${label}</div>
+      <div class="level-desc">${desc}</div>
+      <span class="level-tag ${l.cls}">${tag}</span>
+    </div>`;
+  }).join('');
+  return `<div class="levels-bar"><div class="levels-title">${title}</div><div class="levels-grid">${cards}</div></div>`;
+}
+
+function selectLevel(n) { SELECTED_LEVEL = n; renderLanding(); }
+
+function startFromLanding() {
+  if(SELECTED_LEVEL === 4) { go('n4-axes'); }
+  else { go('questionnaire'); }
+}
+
+function renderN4Axes() {
+  const t = u();
+  const axisCards = N4_AXES.map(ax => {
+    const label = LANG==='fr' ? ax.fr : ax.en;
+    const isOn = SELECTED_AXES.includes(ax.id);
+    const maxReached = SELECTED_AXES.length >= 4 && !isOn;
+    return `<div class="axis-card ${isOn?'on':''} ${maxReached?'disabled-max':''}" onclick="toggleAxis('${ax.id}')">
+      <div class="axis-check"><svg viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4.5 4.5,8 11,1"/></svg></div>
+      <span class="axis-label">${label}</span>
+    </div>`;
+  }).join('');
+  const count = SELECTED_AXES.length;
+  const canContinue = count >= 2;
+  el('root').innerHTML = `
+  ${TB('','')}
+  <div class="page">
+    <div class="axes-page">
+      <div class="phase-kicker">N4 · Fusion</div>
+      <h2 class="axes-title">${t.axes_title}</h2>
+      <p class="axes-sub">${t.axes_sub}</p>
+      <div class="axes-counter"><strong>${count}</strong> / 4 ${t.axes_selected}</div>
+      <div class="axes-grid">${axisCards}</div>
+      ${!canContinue?`<p style="font-size:.75rem;color:var(--text3);margin-bottom:16px">${t.axes_min}</p>`:''}
+      <div class="axes-footer">
+        <button class="btn btn-ghost btn-sm" onclick="go('')">${t.axes_back}</button>
+        <button class="btn btn-primary btn-sm" onclick="go('questionnaire')" ${!canContinue?'disabled':''}>${t.axes_continue}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleAxis(id) {
+  const idx = SELECTED_AXES.indexOf(id);
+  if(idx === -1) { if(SELECTED_AXES.length >= 4) return; SELECTED_AXES.push(id); }
+  else { SELECTED_AXES.splice(idx,1); }
+  saveAxes(); renderN4Axes();
+}
+
+function getResumeBannerHTML() {
+  const t = u();
+  if (!QD || Object.keys(QD).length === 0) return '';
+  if (QD._completedAt) {
+    return `<div class="resume-banner rb-green">
+      <div><div class="rb-title">${t.resume_done}</div><div class="rb-sub">${t.resume_done_sub}</div></div>
+      <button class="btn btn-secondary btn-sm" onclick="go('merci')">${t.resume_done_btn}</button>
+    </div>`;
+  } else {
+    return `<div class="resume-banner rb-gold">
+      <div><div class="rb-title">${t.resume_prog}</div><div class="rb-sub">${t.resume_prog_sub}</div></div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn btn-primary btn-sm" onclick="go('questionnaire')">${t.resume_btn}</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearAndStart()" style="font-size:.65rem">${t.restart}</button>
+      </div>
+    </div>`;
+  }
+}
+
+function clearAndStart() {
+  if(!confirm(u().confirm_restart)) return;
+  QD={}; saveQ(); go('questionnaire');
+}
+
+function getUserCode() {
+  let c = localStorage.getItem('fym_user_code');
+  if (!c) {
+    c = 'FYM-' + Math.random().toString(36).slice(2,5).toUpperCase() + '-' + Date.now().toString(36).slice(-4).toUpperCase();
+    localStorage.setItem('fym_user_code', c);
+  }
+  return c;
+}
+
+function renderLanding() {
+  el('root').innerHTML = `
+  ${TB('',`<button class="btn-tb" onclick="go('production')">⚙ ${u().prod_btn}</button>`)}
+  <div class="page">
+    <div class="landing">
+      <div class="landing-hero">
+        <div class="landing-inner">
+
+          <h1 class="landing-title">${u().title}</h1>
+          <p class="landing-sub">${u().sub}</p>
+          <div class="landing-ctas">
+            <button class="btn btn-primary" style="font-size:.9rem;padding:14px 32px" onclick="startFromLanding()">
+              ${u().begin}
+            </button>
+            <button class="btn btn-ghost" style="font-size:.9rem;padding:14px 24px;border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.65)" onclick="go('production')">
+              ${u().prod_btn}
+            </button>
+          </div>
+          ${getResumeBannerHTML()}
+          ${getLevelsBarHTML()}
+          ${getComparisonTableHTML()}
+        </div>
+      </div>
+      <div class="landing-footer">
+        <div class="lf-tagline">${u().tagline}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// QUESTIONNAIRE WIZARD
+// ══════════════════════════════════════════════════════════════
+
+function renderQuestionnaire() {
+  const sec=Q_STEPS[QSTEP];
+  const total=Q_STEPS.length;
+  const pct=Math.round(QSTEP/total*100);
+
+  el('root').innerHTML=`
+  const _sl = getSecLang(sec);
+  el('root').innerHTML = `
+  ${TB(`Section <em>${sec.letter}</em> — ${_sl.title}`,`<button class="btn-tb" onclick="saveQ();toast(u().saved,'ok')">${u().save}</button>`)}
+  <div class="page" id="wiz-page">
+    <!-- sticky nav -->
+    <div class="wiz-nav">
+      <span class="wiz-home" onclick="go('')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        ${u().home}
+      </span>
+      <div class="wiz-nav-sep"></div>
+      <div class="wiz-sections">
+        ${Q_STEPS.map((s,i)=>`<button class="wiz-sec-btn ${i===QSTEP?'active':i<QSTEP?'done':''}" onclick="jumpStep(${i})">${s.letter}</button>`).join('')}
+      </div>
+      <div class="wiz-progress-wrap">
+        <div class="wiz-progress-track"><div class="wiz-progress-fill" style="width:${pct}%"></div></div>
+        <div class="wiz-progress-label">${QSTEP+1} / ${total}</div>
+      </div>
+      <div class="wiz-nav-sep"></div>
+      <div class="wiz-arrows">
+        <button class="wiz-arrow" onclick="qPrev()" ${QSTEP===0?'disabled':''}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg>
+        </button>
+        <button class="wiz-arrow" onclick="qNext()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            ${QSTEP<total-1?'<polyline points="9,18 15,12 9,6"/>':'<polyline points="20,6 9,17 4,12"/>'}
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="wizard-body">
+      ${u().q_lang_notice ? `<div style="background:var(--navy-soft);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;font-size:.75rem;color:var(--text3);margin-bottom:16px;display:flex;align-items:center;gap:8px"><span>ℹ</span><span>${u().q_lang_notice}</span></div>` : ''}
+      ${renderQSection(sec)}
+    </div>
+
+    <div class="wiz-footer">
+      <div class="wiz-footer-info">${QSTEP<total-1?`${u().sec_next} : ${getSecLang(Q_STEPS[QSTEP+1]).title}`:`${u().sec_last}`}</div>
+      <div class="wiz-footer-actions">
+        <button class="btn btn-secondary btn-sm" onclick="qPrev()" ${QSTEP===0?'disabled':''}>← Précédent</button>
+        ${QSTEP<total-1
+          ?`<button class="btn btn-primary btn-sm" onclick="qNext()">Suivant →</button>`
+          :`<button class="btn btn-primary btn-sm" onclick="qFinish()">Terminer ✓</button>`}
+      </div>
+    </div>
+  </div>`;
+
+  restoreQ(); attachQ();
+}
+
+function getSecLang(s) {
+  const lang = ['fr','en'].includes(LANG)?LANG:'en';
+  return { title: s[lang]?.title||s.fr?.title||s.title||'', intro: s[lang]?.intro||s.fr?.intro||s.intro||'' };
+}
+function SH(sec) {
+  const sl = getSecLang(sec);
+  return `<div class="wsec-head"><div class="wsec-letter">${sec.letter}</div><div class="wsec-info"><div class="wsec-suplabel">Section ${sec.letter}</div><div class="wsec-title">${sl.title}</div><div class="wsec-intro">${sl.intro}</div></div></div><div class="wsec-body">`;
+}
+function F(name,label,type='text',ph='',cls='') {
+  if(type==='ta') return `<div class="wf"><label class="wlabel">${label}</label><textarea class="winput ${cls}" name="${name}" placeholder="${ph}"></textarea></div>`;
+  return `<div class="wf"><label class="wlabel">${label}</label><input type="text" class="winput" name="${name}" placeholder="${ph}"></div>`;
+}
+function CHK(name,val,label) {
+  const on=Array.isArray(QD[name])&&QD[name].includes(val);
+  return `<label class="wchk ${on?'on':''}" data-chk="${name}" data-val="${esc(val)}"><div class="wchk-box"><svg viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4.5 4.5,8 11,1"/></svg></div><span>${label}</span></label>`;
+}
+function RAD(name,val,label) {
+  const on=QD[name]===val;
+  return `<div class="wrad ${on?'on':''}" data-rad="${name}" data-val="${esc(val)}"><span class="wrad-letter">${val}</span><div class="wrad-dot"></div><span>${label}</span></div>`;
+}
+
+function renderQSection(sec) {
+  const lang = ['fr','en'].includes(LANG) ? LANG : 'en';
+  if(lang === 'en') {
+    if(sec.id==='A') return secA_en(sec);
+    if(sec.id==='B') return secB_en(sec);
+    if(sec.id==='C') return secC_en(sec);
+    if(sec.id==='D') return secD_en(sec);
+    if(sec.id==='E') return secE_en(sec);
+    if(sec.id==='F') return secF_en(sec);
+  }
+  if(sec.id==='A') return secA(sec);
+  if(sec.id==='B') return secB(sec);
+  if(sec.id==='C') return secC(sec);
+  if(sec.id==='D') return secD(sec);
+  if(sec.id==='E') return secE(sec);
+  if(sec.id==='F') return secF(sec);
+  return '';
+}
+
+function secA(s) { return `<div class="wsec">${SH(s)}
+  <div class="wg3">${F('date_naissance','Date de naissance','text','15 mars 1975')}${F('heure_naissance','Heure de naissance','text','14h30 (si connue)')}${F('lieu_naissance','Lieu de naissance','text','Ville, Pays')}</div>
+  <div class="wg3">${F('sexe','Sexe')}${F('residence','Résidence actuelle')}${F('fratrie','Position dans la fratrie','text','ex: 2ème sur 3')}</div>
+  <div class="wg3">${F('situation','Situation personnelle','text','célibataire / couple / autre')}${F('situation_parents','Situation des parents','text','ensemble / séparés / autre')}${F('reveil','Heure naturelle de réveil')}</div>
+  ${F('saison','Saison de vitalité maximale')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">Lieux de vie importants <span style="text-transform:none;letter-spacing:0;color:var(--text3)">(3 à 5 — chronologique)</span></label>
+    ${[1,2,3,4,5].map(i=>`<div class="lieu-row"><div class="lieu-num">${i}</div><input type="text" class="winput" name="lieu_${i}" placeholder="Lieu"><input type="text" class="winput" name="periode_${i}" placeholder="Période"></div>`).join('')}
+  </div>
+  <div class="wdiv"></div>
+  ${F('event_1','Événement majeur 1 — intitulé · âge · nature')}${F('event_2','Événement majeur 2')}${F('event_3','Événement majeur 3')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">Ce qui se répète malgré vous</label>
+    ${CHK('pat','rumination','Rumination — pensées qui tournent en boucle')}
+    ${CHK('pat','repetition_rel','Répétition des mêmes dynamiques relationnelles')}
+    ${CHK('pat','autocritique','Autocritique et culpabilité chroniques')}
+    ${CHK('pat','validation','Chercher validation avant d\'agir')}
+    ${CHK('pat','isolement','Isolement dans les moments difficiles')}
+    ${CHK('pat','savoir_incarner','Comprendre sans que ça change quelque chose')}
+    ${CHK('pat','abandon','Commencer fort — abandonner avant l\'aboutissement')}
+    ${CHK('pat','procrastination','Procrastination et report systématique')}
+    ${CHK('pat','oscillation','Alternance enthousiasme / découragement brutal')}
+  </div>
+  ${F('pat_autre','Autre pattern — précisez')}
+  <div class="wdiv"></div>
+  ${F('action_q1','Ce matin — la première chose faite, vous l\'aviez décidée combien de temps avant ?')}
+  ${F('action_q2','Quand quelque chose vous manque ou vous fait peur — vous le remarquez d\'abord dans la tête ou dans le corps ?')}
+  ${F('action_q3','Quand vous vous regardez agir — vous considérez le narratif interne ou vous le laissez passer ?')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">Domaines de résistance intérieure</label>
+    <div class="wg2">
+      ${CHK('res','regard','Regard et jugement des autres')}${CHK('res','corps','Corps, sensations, santé physique')}
+      ${CHK('res','argent','Argent et rapport à l\'abondance')}${CHK('res','creativite','Créativité et expression personnelle')}
+      ${CHK('res','pro','Vie professionnelle / visibilité')}${CHK('res','autorite','Rapport à l\'autorité et aux règles')}
+      ${CHK('res','intimite','Intimité et vulnérabilité')}${CHK('res','emotions','Émotions intenses — colère, honte, peur')}
+      ${CHK('res','sexualite','Sexualité et désir')}${CHK('res','estime','Estime de soi et valeur personnelle')}
+    </div>
+  </div>
+  ${F('res_autre','Autre résistance — précisez')}
+</div></div>`; }
+
+function secB(s) {
+  const rows=[['père','pere'],['mère','mere'],['grand-père paternel','gpat'],['grand-mère paternelle','gmat_p'],['grand-père maternel','gmat'],['grand-mère maternelle','gmam']];
+  return `<div class="wsec">${SH(s)}
+  ${rows.map(([l,k])=>`<div class="wf"><label class="wlabel">${l.charAt(0).toUpperCase()+l.slice(1)}</label><div class="wg2">${F(`${k}_dn`,'Date de naissance')}${F(`${k}_lieu`,'Lieu de naissance')}</div></div><div class="wdiv"></div>`).join('')}
+  ${F('lignee_events','Événements familiaux notables transmis — deuils non faits · ruptures · silences · secrets · traumatismes','ta','Décrivez les événements significatifs...','xtall')}
+</div></div>`; }
+
+function secC(s) { return `<div class="wsec">${SH(s)}
+  ${F('depuis_quand','Depuis quand êtes-vous en recherche consciente ?')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">Comment cela a commencé ?</label>
+    <div class="wg2">${CHK('decl','crise','Crise — effondrement')}${CHK('decl','lecture','Lecture — texte ou livre')}${CHK('decl','rencontre','Rencontre — personne ou enseignant')}${CHK('decl','experience','Expérience directe intérieure')}</div>
+  </div>
+  ${F('decl_autre','Autre déclencheur — précisez')}
+  <div class="wdiv"></div>
+  ${F('demarches','Démarches traversées depuis le début — traditions · enseignants · pratiques · thérapies — chronologique','ta','','tall')}
+  ${F('avancees','Ce qui a produit les avancées les plus réelles','ta','','tall')}
+  ${F('resistance_c','Ce qui résiste malgré tout','ta','','tall')}
+  ${F('stade_actuel','Où en êtes-vous aujourd\'hui — selon vous ?','ta','','tall')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">Rapport actuel à la pratique</label>
+    ${CHK('pratique','reguliere','Régulière et stable')}${CHK('pratique','intellectualisee','Intellectualisée — plus vraiment vécue')}
+    ${CHK('pratique','cherchee','Cherchée mais irrégulière')}${CHK('pratique','abandonnee','Abandonnée')}
+  </div>
+</div></div>`; }
+
+function secD(s) { return `<div class="wsec">${SH(s)}
+  ${F('enneagram_q1','Ce que je ne me permets pas','ta','','tall')}
+  ${F('enneagram_q2','Sous pression, je deviens','ta','')}
+  ${F('enneagram_q3','Mon rapport à la perfection / à l\'erreur','ta','','tall')}
+  ${F('enneagram_q4','Ce que je cherche dans mes relations proches','ta','','tall')}
+  ${F('enneagram_q5','Ce que je redoute le plus d\'être vu comme','ta','','tall')}
+</div></div>`; }
+
+function secE(s) {
+  const pairs=[['sct_critique','Quand on me critique…'],['sct_regles','Les règles existent pour…'],['sct_attends','Ce que j\'attends des autres…'],['sct_naccepte','Ce que je n\'accepte pas chez moi…'],['sct_difficulte','Ma principale difficulté est…'],['sct_souffrance','La souffrance…'],['sct_fierte','Ce dont je suis fier(e)…'],['sct_jamais_dit','Ce que je n\'ai jamais dit à personne…'],['sct_trompe','Quand je me trompe…'],['sct_vieillissant','En vieillissant…']];
+  return `<div class="wsec">${SH(s)}
+  <div class="wg2">${pairs.map(([n,l])=>`<div class="wf"><label class="wlabel">${l}</label><textarea class="winput" name="${n}"></textarea></div>`).join('')}</div>
+</div></div>`; }
+
+function secF(s) {
+  const qs=[
+    {n:'q1',t:'Face à un défaut décrit avec précision, votre première réaction intérieure est :',o:[['A','Une résistance — même si vous voyez qu\'il a raison'],['B','Une curiosité sur pourquoi il perçoit ça ainsi'],['C','Une confirmation de ce que vous saviez déjà'],['D','Une envie de comprendre d\'où ça vient en vous']]},
+    {n:'q2',t:'Décision mauvaise trois mois plus tard. Vous pensez :',o:[['A','J\'aurais dû savoir'],['B','Qu\'est-ce qui en moi a produit ce choix ?'],['C','Les circonstances n\'étaient pas favorables'],['D','C\'est une information utile sur mon fonctionnement']]},
+    {n:'q3',t:'Quand vous souffrez, spontanément :',o:[['A','Je cherche à comprendre pourquoi'],['B','Je cherche à la faire partir'],['C','Je l\'observe sans savoir quoi en faire'],['D','Je la transforme en action ou en projet']]},
+    {n:'q4',t:'Ce que vos proches pensent de vous :',o:[['A','C\'est important mais pas déterminant'],['B','Ça ne devrait pas compter mais ça compte'],['C','C\'est leur problème'],['D','C\'est une donnée parmi d\'autres']]},
+    {n:'q5',t:'"Je me connais bien — mais ça ne change pas grand-chose." Vous vous reconnaissez ?',o:[['A','Complètement'],['B','Partiellement'],['C','Pas vraiment'],['D','C\'est exactement mon problème central']]},
+    {n:'q6',t:'Qu\'est-ce qui vous a amené à faire cette étude ?',o:[['A','Une curiosité sur moi-même'],['B','Une souffrance précise'],['C','L\'envie de changer quelque chose'],['D','Un sentiment que je ne me connais pas vraiment']]},
+    {n:'q7',t:'Si ce document montrait quelque chose de vrai mais douloureux :',o:[['A','Le savoir quand même'],['B','Le savoir si ça peut m\'aider'],['C','Que ça soit dit avec précaution'],['D','Honnêtement, je ne sais pas']]}
+  ];
+  return `<div class="wsec">${SH(s)}
+  ${qs.map(q=>`<div class="wf"><div class="wq-text"><span class="wq-num">${q.n.toUpperCase()}</span>${q.t}</div><div class="wrad-grid">${q.o.map(([v,l])=>RAD(q.n,v,l)).join('')}</div></div><div class="wdiv"></div>`).join('')}
+  <p style="font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:14px">Q8 à Q10 — Répondez sans construire. Une ou deux phrases suffisent.</p>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q8</span> "Ce que je ne me permets pas, c'est…"</label><textarea class="winput tall" name="q8"></textarea></div>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q9</span> "Je suis là parce que…"</label><textarea class="winput tall" name="q9"></textarea></div>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q10</span> "Ce que j'attends vraiment de cette étude, c'est…"</label><textarea class="winput tall" name="q10"></textarea></div>
+  <div class="wdiv"></div>
+  <p style="font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Questions de tension</p>
+  <p style="font-size:.78rem;color:var(--text3);font-style:italic;margin-bottom:16px;line-height:1.5">Prenez votre temps. Résistez à l'envie d'habiller la réponse.</p>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q11</span> Exemple concret d'une situation récente où vous avez mal agi. <em style="font-style:italic;text-transform:none;letter-spacing:0">Une situation précise, un moment réel.</em></label><textarea class="winput xtall" name="q11"></textarea></div>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q12</span> Ce que vous ne voulez pas changer — même si vous savez que ça vous nuit.</label><textarea class="winput xtall" name="q12"></textarea></div>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q13</span> Ce que vous évitez encore de regarder.</label><textarea class="winput xtall" name="q13"></textarea></div>
+</div></div>`; }
+
+
+// ──────────────────────────────────────────────
+// SECTIONS — ENGLISH
+// ──────────────────────────────────────────────
+
+function secA_en(s) { return `<div class="wsec">${SH(s)}
+  <div class="wg3">${F('date_naissance','Date of birth','text','15 March 1975')}${F('heure_naissance','Time of birth','text','2:30 PM (if known)')}${F('lieu_naissance','Place of birth','text','City, Country')}</div>
+  <div class="wg3">${F('sexe','Sex')}${F('residence','Current residence')}${F('fratrie','Position in the family','text','e.g. 2nd of 3')}</div>
+  <div class="wg3">${F('situation','Personal situation','text','single / couple / other')}${F('situation_parents','Parents situation','text','together / separated / other')}${F('reveil','Natural wake-up time')}</div>
+  ${F('saison','Season of maximum vitality')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">Important places of residence <span style="text-transform:none;letter-spacing:0;color:var(--text3)">(3 to 5 — chronological)</span></label>
+    ${[1,2,3,4,5].map(i=>`<div class="lieu-row"><div class="lieu-num">${i}</div><input type="text" class="winput" name="lieu_${i}" placeholder="Place"><input type="text" class="winput" name="periode_${i}" placeholder="Period"></div>`).join('')}
+  </div>
+  <div class="wdiv"></div>
+  ${F('event_1','Major event 1 — title · age · nature')}${F('event_2','Major event 2')}${F('event_3','Major event 3')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">What repeats despite you</label>
+    ${CHK('pat','rumination','Rumination — thoughts going in circles')}
+    ${CHK('pat','repetition_rel','Repetition of the same relational dynamics')}
+    ${CHK('pat','autocritique','Chronic self-criticism and guilt')}
+    ${CHK('pat','validation','Seeking validation before acting')}
+    ${CHK('pat','isolement','Withdrawal in difficult moments')}
+    ${CHK('pat','savoir_incarner','Understanding without it changing anything')}
+    ${CHK('pat','abandon','Starting strong — abandoning before completion')}
+    ${CHK('pat','procrastination','Procrastination and systematic postponement')}
+    ${CHK('pat','oscillation','Alternating enthusiasm / brutal discouragement')}
+  </div>
+  ${F('pat_autre','Other pattern — specify')}
+  <div class="wdiv"></div>
+  ${F('action_q1','This morning — the first thing you did, how long before had you decided it?')}
+  ${F('action_q2','When something is missing or frightening — do you notice it first in the mind or the body?')}
+  ${F('action_q3','When you watch yourself act — do you consider the internal narrative or let it pass?')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">Areas of inner resistance</label>
+    <div class="wg2">
+      ${CHK('res','regard','Others\' gaze and judgement')}${CHK('res','corps','Body, sensations, physical health')}
+      ${CHK('res','argent','Money and relationship to abundance')}${CHK('res','creativite','Creativity and personal expression')}
+      ${CHK('res','pro','Professional life / visibility')}${CHK('res','autorite','Relationship to authority and rules')}
+      ${CHK('res','intimite','Intimacy and vulnerability')}${CHK('res','emotions','Intense emotions — anger, shame, fear')}
+      ${CHK('res','sexualite','Sexuality and desire')}${CHK('res','estime','Self-esteem and personal value')}
+    </div>
+  </div>
+  ${F('res_autre','Other resistance — specify')}
+</div></div>`; }
+
+function secB_en(s) {
+  const rows=[['Father','pere'],['Mother','mere'],['Paternal grandfather','gpat'],['Paternal grandmother','gmat_p'],['Maternal grandfather','gmat'],['Maternal grandmother','gmam']];
+  return `<div class="wsec">${SH(s)}
+  ${rows.map(([l,k])=>`<div class="wf"><label class="wlabel">${l}</label><div class="wg2">${F(`${k}_dn`,'Date of birth')}${F(`${k}_lieu`,'Place of birth')}</div></div><div class="wdiv"></div>`).join('')}
+  ${F('lignee_events','Notable family events transmitted — unresolved mourning · ruptures · silences · secrets · traumas','ta','Describe significant events...','xtall')}
+</div></div>`; }
+
+function secC_en(s) { return `<div class="wsec">${SH(s)}
+  ${F('depuis_quand','How long have you been on a conscious search?')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">How did it begin?</label>
+    <div class="wg2">${CHK('decl','crise','Crisis — collapse')}${CHK('decl','lecture','Reading — text or book')}${CHK('decl','rencontre','Encounter — person or teacher')}${CHK('decl','experience','Direct inner experience')}</div>
+  </div>
+  ${F('decl_autre','Other trigger — specify')}
+  <div class="wdiv"></div>
+  ${F('demarches','Approaches since the beginning — traditions · teachers · practices · therapies — chronological','ta','','tall')}
+  ${F('avancees','What produced the most real advances','ta','','tall')}
+  ${F('resistance_c','What still resists despite everything','ta','','tall')}
+  ${F('stade_actuel','Where are you today — in your own view?','ta','','tall')}
+  <div class="wdiv"></div>
+  <div class="wf"><label class="wlabel">Current relationship to practice</label>
+    ${CHK('pratique','reguliere','Regular and stable')}${CHK('pratique','intellectualisee','Intellectualised — no longer really lived')}
+    ${CHK('pratique','cherchee','Sought but irregular')}${CHK('pratique','abandonnee','Abandoned')}
+  </div>
+</div></div>`; }
+
+function secD_en(s) { return `<div class="wsec">${SH(s)}
+  ${F('enneagram_q1','What I do not allow myself','ta','','tall')}
+  ${F('enneagram_q2','Under pressure, I become','ta','')}
+  ${F('enneagram_q3','My relationship to perfection / to error','ta','','tall')}
+  ${F('enneagram_q4','What I look for in close relationships','ta','','tall')}
+  ${F('enneagram_q5','What I most dread being seen as','ta','','tall')}
+</div></div>`; }
+
+function secE_en(s) {
+  const pairs=[['sct_critique','When I am criticised…'],['sct_regles','Rules exist to…'],['sct_attends','What I expect from others…'],['sct_naccepte','What I do not accept in myself…'],['sct_difficulte','My main difficulty is…'],['sct_souffrance','Suffering…'],['sct_fierte','What I am proud of…'],['sct_jamais_dit','What I have never told anyone…'],['sct_trompe','When I am wrong…'],['sct_vieillissant','As I grow older…']];
+  return `<div class="wsec">${SH(s)}
+  <div class="wg2">${pairs.map(([n,l])=>`<div class="wf"><label class="wlabel">${l}</label><textarea class="winput" name="${n}"></textarea></div>`).join('')}</div>
+</div></div>`; }
+
+function secF_en(s) {
+  const qs=[
+    {n:'q1',t:'Faced with a flaw described precisely, your first inner reaction is:',o:[['A','Resistance — even if you see they are right'],['B','Curiosity about why they perceive it that way'],['C','Confirmation of what you already knew'],['D','A desire to understand where it comes from in you']]},
+    {n:'q2',t:'A bad decision three months later. You think:',o:[['A','I should have known'],['B','What in me produced this choice?'],['C','The circumstances were not favourable'],['D','This is useful information about how I function']]},
+    {n:'q3',t:'When you suffer, spontaneously:',o:[['A','I seek to understand why'],['B','I seek to make it go away'],['C','I observe it without knowing what to do with it'],['D','I transform it into action or a project']]},
+    {n:'q4',t:'What those close to you think of you:',o:[['A','It matters but is not determining'],['B','It should not count but it does'],['C','That is their problem'],['D','It is one piece of data among others']]},
+    {n:'q5',t:'"I know myself well — but it does not change much." Do you recognise yourself?',o:[['A','Completely'],['B','Partially'],['C','Not really'],['D','That is exactly my central problem']]},
+    {n:'q6',t:'What brought you to undertake this study?',o:[['A','Curiosity about myself'],['B','A specific suffering'],['C','The desire to change something'],['D','A feeling that I do not really know myself']]},
+    {n:'q7',t:'If this document showed something true but painful:',o:[['A','Know it anyway'],['B','Know it if it can help me'],['C','Have it said with care'],['D','Honestly, I do not know']]}
+  ];
+  return `<div class="wsec">${SH(s)}
+  ${qs.map(q=>`<div class="wf"><div class="wq-text"><span class="wq-num">${q.n.toUpperCase()}</span>${q.t}</div><div class="wrad-grid">${q.o.map(([v,l])=>RAD(q.n,v,l)).join('')}</div></div><div class="wdiv"></div>`).join('')}
+  <p style="font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:14px">Q8 to Q10 — Answer without constructing. One or two sentences are enough.</p>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q8</span> "What I do not allow myself is…"</label><textarea class="winput tall" name="q8"></textarea></div>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q9</span> "I am here because…"</label><textarea class="winput tall" name="q9"></textarea></div>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q10</span> "What I really expect from this study is…"</label><textarea class="winput tall" name="q10"></textarea></div>
+  <div class="wdiv"></div>
+  <p style="font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Tension questions</p>
+  <p style="font-size:.78rem;color:var(--text3);font-style:italic;margin-bottom:16px;line-height:1.5">Take your time. Resist the urge to dress up the answer.</p>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q11</span> A concrete example of a recent situation where you acted badly. <em style="font-style:italic;text-transform:none;letter-spacing:0">A specific situation, a real moment.</em></label><textarea class="winput xtall" name="q11"></textarea></div>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q12</span> What you do not want to change — even though you know it harms you.</label><textarea class="winput xtall" name="q12"></textarea></div>
+  <div class="wf"><label class="wlabel"><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:.68rem">Q13</span> What you are still avoiding looking at.</label><textarea class="winput xtall" name="q13"></textarea></div>
+</div></div>`; }
+
+function restoreQ() {
+  document.querySelectorAll('[name]').forEach(el => {
+    const v=QD[el.name]; if(!v) return;
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value=v;
+  });
+}
+
+function attachQ() {
+  document.querySelectorAll('input[name],textarea[name]').forEach(i=>{
+    i.addEventListener('input',()=>{ QD[i.name]=i.value; saveQ(); });
+  });
+  document.querySelectorAll('[data-chk]').forEach(l=>{
+    l.addEventListener('click',()=>{
+      const n=l.dataset.chk, v=l.dataset.val;
+      if(!Array.isArray(QD[n])) QD[n]=[];
+      const idx=QD[n].indexOf(v);
+      idx===-1?(QD[n].push(v),l.classList.add('on')):(QD[n].splice(idx,1),l.classList.remove('on'));
+      saveQ();
+    });
+  });
+  document.querySelectorAll('[data-rad]').forEach(r=>{
+    r.addEventListener('click',()=>{
+      const n=r.dataset.rad, v=r.dataset.val;
+      QD[n]=v; saveQ();
+      document.querySelectorAll(`[data-rad="${n}"]`).forEach(x=>x.classList.remove('on'));
+      r.classList.add('on');
+    });
+  });
+}
+
+function jumpStep(i) { QSTEP=i; renderQuestionnaire(); el('wiz-page')?.scrollTo(0,0); }
+function qPrev() { if(QSTEP>0){QSTEP--;renderQuestionnaire();el('wiz-page')?.scrollTo(0,0);} }
+function qNext() {
+  if(QSTEP<Q_STEPS.length-1){QSTEP++;renderQuestionnaire();el('wiz-page')?.scrollTo(0,0);}
+  else qFinish();
+}
+function qFinish() {
+  QD._completedAt = new Date().toISOString();
+  QD._lang = LANG;
+  saveQ();
+  const code = generateShareCode(QD);
+  if(code) localStorage.setItem('fym3_last_code', code);
+  go('merci');
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUCCESS
+// ══════════════════════════════════════════════════════════════
+
+function renderSuccess() {
+  const code=generateShareCode(QD);
+  const url=location.origin+location.pathname+'#import/'+code;
+  const t = u();
+  el('root').innerHTML=`
+  ${TB('',`<button class="btn-tb" onclick="go('questionnaire')">${t.edit_answers}</button>`)}
+  <div class="page"><div class="success-page">
+    <div class="success-icon">✓</div>
+    <h2 class="success-title">${t.q_complete_title}</h2>
+    <p class="success-sub">${t.q_complete_sub}</p>
+    <div class="code-card">
+      <div class="code-card-head"><span class="code-card-label">${t.share_code}</span><button class="btn-xs-light" onclick="copyText(el('share-code').textContent)">${t.copy_code}</button></div>
+      <div class="code-body" id="share-code">${esc(code)}</div>
+    </div>
+    <div class="code-card" style="margin-bottom:20px">
+      <div class="code-card-head"><span class="code-card-label">${t.direct_link}</span><button class="btn-xs-light" onclick="copyText('${esc(url)}')">${t.copy_link}</button></div>
+      <div class="code-body">${esc(url.slice(0,120))}${url.length>120?'…':''}</div>
+    </div>
+    <div class="info-box">
+      <strong>${t.how_to}</strong><br>
+      ${t.how_body}<br><br>
+      <strong>${t.keep_code}</strong>
+    </div>
+  </div></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PRODUCTION
+// ══════════════════════════════════════════════════════════════
+
+function renderProduction() {
+  const hasKey=!!S.apiKey;
+  el('root').innerHTML=`
+  ${TB('Espace production',`
+    <button class="btn-tb" onclick="showImportModal()">↓ Importer</button>
+    <button class="btn-tb primary" onclick="showNewModal()">+ Nouveau profil</button>`)}
+  <div class="page"><div class="prod-page">
+    <div class="apikey-bar">
+      <span class="apikey-tag">Clé API</span>
+      ${hasKey
+        ?`<span class="apikey-set">Claude API configurée</span>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="changeKey()">Modifier</button>`
+        :`<input type="password" class="apikey-input" id="akey" placeholder="sk-ant-…" value="${esc(S.apiKey)}">
+          <button class="btn btn-primary btn-sm" onclick="saveKey()">Enregistrer</button>`}
+    </div>
+
+    <h1 class="prod-title">Profils</h1>
+    <p class="prod-sub">${S.profiles.length} profil${S.profiles.length!==1?'s':''} · Prompt V5</p>
+
+    <div class="profiles-grid">
+      ${S.profiles.map(p=>{
+        const pct=phasePct(p);
+        const done=PHASES.filter(ph=>p.phases?.[ph.id]?.status==='done').length;
+        return `<div class="profile-card" onclick="openProfile('${p.id}')">
+          <div class="profile-card-accent"></div>
+          <button class="profile-del" onclick="event.stopPropagation();delProfile('${p.id}')">✕</button>
+          <div class="profile-card-name">${esc(p.name||'Sans nom')}</div>
+          <div class="profile-card-meta">${p.questionnaire?.date_naissance?'Né(e) le '+esc(p.questionnaire.date_naissance)+' · ':''} Créé le ${new Date(p.createdAt).toLocaleDateString('fr-FR')}</div>
+          <div class="profile-card-bar"><div class="profile-card-fill" style="width:${pct}%"></div></div>
+          <div class="profile-card-stats">
+            <span class="pstat"><strong>${done}</strong>/${PHASES.length} phases</span>
+            <span class="pstat"><strong>${pct}%</strong></span>
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="add-card" onclick="showNewModal()">
+        <div class="add-card-icon">+</div>
+        <div class="add-card-label">Nouveau profil</div>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function saveKey() { S.apiKey=(el('akey')?.value||'').trim(); save(); toast('✓ Clé API enregistrée','ok'); renderProduction(); }
+function changeKey() { S.apiKey=''; save(); renderProduction(); }
+
+function showNewModal() {
+  modal(`<div class="modal-title">Nouveau profil</div>
+    <div class="modal-desc">Créez un profil vide ou importez ensuite un questionnaire.</div>
+    <div class="modal-field"><label class="modal-label">Nom du profil</label>
+      <input type="text" class="modal-input" id="mpname" placeholder="ex: Marie D., Profil 01…"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary btn-sm" onclick="createProfile()">Créer →</button>
+    </div>`);
+  setTimeout(()=>el('mpname')?.focus(),50);
+}
+
+function showImportModal() {
+  modal(`<div class="modal-title">Importer un profil</div>
+    <div class="modal-desc">Collez le code de partage ou un lien direct transmis par le client.</div>
+    <div class="modal-field"><label class="modal-label">Code de partage ou lien</label>
+      <textarea class="modal-input mono" id="icode" placeholder="Collez ici…" rows="4"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary btn-sm" onclick="doImport()">Importer →</button>
+    </div>`);
+}
+
+function modal(html) {
+  const d=document.createElement('div'); d.className='moverlay'; d.id='modal';
+  d.innerHTML=`<div class="modal">${html}</div>`;
+  d.addEventListener('click',e=>{ if(e.target===d) closeModal(); });
+  document.body.appendChild(d);
+}
+function closeModal() { el('modal')?.remove(); }
+
+function doImport() {
+  let raw=(el('icode')?.value||'').trim();
+  if(raw.includes('#import/')) raw=raw.split('#import/')[1];
+  importCode(raw, false);
+  closeModal();
+}
+
+function importCode(code, autoNav) {
+  const data=decodeCode(code.trim());
+  if(!data){ toast('Code invalide','err'); if(autoNav) go('production'); return; }
+  const name=data.date_naissance?`Profil — ${data.date_naissance}`:'Profil importé';
+  S.profiles.push({id:uid(),name,createdAt:new Date().toISOString(),questionnaire:data,phases:{},checks:{}});
+  save();
+  toast('✓ Profil importé','ok');
+  if(autoNav) go('production'); else renderProduction();
+}
+
+function createProfile() {
+  const name=(el('mpname')?.value||'').trim()||'Nouveau profil';
+  const p={id:uid(),name,createdAt:new Date().toISOString(),questionnaire:{},phases:{},checks:{}};
+  S.profiles.push(p); save(); closeModal();
+  openProfile(p.id);
+}
+
+function delProfile(id) {
+  if(!confirm('Supprimer ce profil ? Action irréversible.')) return;
+  S.profiles=S.profiles.filter(p=>p.id!==id); save(); renderProduction();
+}
+
+function openProfile(id) {
+  CUR_PROFILE=id; CUR_PHASE=PHASES[0].id;
+  go(`profile/${id}/phase/${PHASES[0].id}`);
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROFILE VIEW
+// ══════════════════════════════════════════════════════════════
+
+function renderProfile() {
+  const p=getProfile(CUR_PROFILE);
+  if(!p){ go('production'); return; }
+  const pct=phasePct(p);
+  const done=PHASES.filter(ph=>p.phases?.[ph.id]?.status==='done').length;
+
+  el('root').innerHTML=`
+  ${TB(`<span onclick="go('production')" style="cursor:pointer;opacity:.7">Production</span> / <em>${esc(p.name)}</em>`,
+    `<button class="btn-tb" onclick="selectPhase('assembly')">Assembler la note</button>`)}
+  <div class="profile-shell">
+    <div class="profile-side">
+      <div class="ps-top">
+        <div class="ps-name">${esc(p.name)}</div>
+        <div class="ps-dob">${p.questionnaire?.date_naissance||'Date non renseignée'}</div>
+      </div>
+      <div class="ps-prog-wrap">
+        <div class="ps-prog-track"><div class="ps-prog-fill" style="width:${pct}%"></div></div>
+        <div class="ps-prog-label"><span>Progression</span><span>${done}/${PHASES.length}</span></div>
+      </div>
+      <nav class="ps-nav" id="psnav">
+        ${PHASES.map(ph=>{
+          const st=p.phases?.[ph.id]?.status||'todo';
+          return `<div class="ps-item ${String(CUR_PHASE)===String(ph.id)?'active':''}" onclick="selectPhase('${ph.id}')">
+            <span class="ps-item-num">P${ph.id}</span>
+            <span class="ps-item-label">${ph.title}</span>
+            <span class="ps-dot ${st==='done'?'d-done':st==='active'?'d-active':'d-todo'}"></span>
+          </div>`;
+        }).join('')}
+        <div class="ps-divider"></div>
+        <div class="ps-item ${CUR_PHASE==='assembly'?'active':''}" onclick="selectPhase('assembly')">
+          <span class="ps-item-num">✦</span>
+          <span class="ps-item-label">Assembler la note</span>
+        </div>
+        <div class="ps-item ${CUR_PHASE==='check'?'active':''}" onclick="selectPhase('check')">
+          <span class="ps-item-num">✓</span>
+          <span class="ps-item-label">Vérification finale</span>
+        </div>
+      </nav>
+      <div class="ps-foot">
+        <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;font-size:.72rem" onclick="go('production')">← Retour</button>
+      </div>
+    </div>
+    <div class="profile-main" id="pmain"></div>
+  </div>`;
+
+  renderMain();
+}
+
+function selectPhase(phaseId) {
+  CUR_PHASE=phaseId;
+  go(`profile/${CUR_PROFILE}/phase/${phaseId}`);
+}
+
+function renderMain() {
+  if(CUR_PHASE==='check') { renderChecklist(); return; }
+  if(CUR_PHASE==='assembly') { renderAssembly(); return; }
+  renderPhaseView();
+}
+
+// ══════════════════════════════════════════════════════════════
+// PHASE VIEW
+// ══════════════════════════════════════════════════════════════
+
+function renderPhaseView() {
+  const p=getProfile(CUR_PROFILE);
+  const ph=PHASES.find(x=>String(x.id)===String(CUR_PHASE));
+  if(!p||!ph) return;
+  const ps=p.phases?.[ph.id]||{};
+  const st=ps.status||'todo';
+  const idx=PHASES.findIndex(x=>String(x.id)===String(ph.id));
+  const prev=PHASES[idx-1], next=PHASES[idx+1];
+  let promptShow=ph.prompt;
+  if(ph.id===2&&p.questionnaire) promptShow=promptShow.replace('[QUESTIONNAIRE_DATA]','[Questionnaire — injecté automatiquement]');
+
+  el('pmain').innerHTML=`<div class="phase-view">
+    <div class="phase-kicker">Phase ${ph.id} · ${ph.sub}</div>
+    <h2 class="phase-title">${ph.title}</h2>
+    <p class="phase-desc-text">${ph.title==='Posture & Identité'?'Définit les règles de production. À envoyer en premier dans tout nouveau fil Claude.':ph.id===2?'Injecte le questionnaire et lance les calculs des 12 approches. Le questionnaire du profil est injecté automatiquement.':'Génère ce chapitre de la note en contexte complet avec toutes les phases précédentes.'}</p>
+
+    <div class="phase-toolbar">
+      <div class="status-group">
+        <button class="spill s-todo ${st==='todo'?'on':''}" onclick="setStatus('todo')">À faire</button>
+        <button class="spill s-active ${st==='active'?'on':''}" onclick="setStatus('active')">En cours</button>
+        <button class="spill s-done ${st==='done'?'on':''}" onclick="setStatus('done')">Terminée</button>
+      </div>
+      <button class="btn-gen" id="bgen" onclick="generatePhase()" ${!S.apiKey?'disabled title="Clé API requise"':''}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>
+        Générer avec Claude
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-label">Prompt Phase ${ph.id}</span>
+        <div class="card-actions">
+          <button class="btn-xs-light" onclick="copyText(getFullPrompt())">Copier complet</button>
+        </div>
+      </div>
+      <pre class="prompt-pre">${esc(promptShow.slice(0,500))}${promptShow.length>500?'\n…':''}</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="card-label">Contenu généré</span>
+        <div class="card-actions">
+          <button id="bstop" style="display:none" class="btn-xs-light" onclick="stopGen()">⏹ Stop</button>
+          <button class="btn-xs-light" onclick="copyText(el('gout')?.value)">Copier</button>
+          <button class="btn-xs-light" onclick="savePhaseContent()">💾 Sauvegarder</button>
+        </div>
+      </div>
+      <textarea class="gen-area" id="gout" placeholder="Le contenu généré apparaîtra ici. Vous pouvez aussi saisir manuellement.">${esc(ps.content||'')}</textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-label">Notes</span></div>
+      <textarea class="notes-area" id="nota" placeholder="Observations, corrections…">${esc(ps.notes||'')}</textarea>
+    </div>
+
+    <div class="phase-nav">
+      <button class="btn btn-ghost btn-sm" onclick="selectPhase('${prev?.id}')" ${!prev?'disabled':''}>← P${prev?.id||''}</button>
+      <button class="btn btn-primary btn-sm" onclick="savePhaseContent()">Sauvegarder</button>
+      <button class="btn btn-ghost btn-sm" onclick="selectPhase('${next?.id}')" ${!next?'disabled':''}>P${next?.id||''} →</button>
+    </div>
+  </div>`;
+
+  el('nota')?.addEventListener('input',function(){
+    const p=getProfile(CUR_PROFILE);
+    if(!p.phases[CUR_PHASE]) p.phases[CUR_PHASE]={};
+    p.phases[CUR_PHASE].notes=this.value; save();
+  });
+}
+
+function setStatus(st) {
+  const p=getProfile(CUR_PROFILE);
+  if(!p.phases[CUR_PHASE]) p.phases[CUR_PHASE]={};
+  p.phases[CUR_PHASE].status=st; save();
+  renderPhaseView(); refreshSidebar();
+}
+
+function savePhaseContent() {
+  const p=getProfile(CUR_PROFILE);
+  if(!p.phases[CUR_PHASE]) p.phases[CUR_PHASE]={};
+  p.phases[CUR_PHASE].content=el('gout')?.value||'';
+  p.phases[CUR_PHASE].notes=el('nota')?.value||'';
+  save(); toast('✓ Sauvegardé','ok');
+}
+
+function getFullPrompt() {
+  const p=getProfile(CUR_PROFILE);
+  const ph=PHASES.find(x=>String(x.id)===String(CUR_PHASE));
+  if(!ph) return '';
+  if(ph.id===2&&p.questionnaire) return ph.prompt.replace('[QUESTIONNAIRE_DATA]',formatQ(p.questionnaire));
+  return ph.prompt;
+}
+
+function refreshSidebar() {
+  const p=getProfile(CUR_PROFILE);
+  document.querySelectorAll('.ps-item').forEach(item=>{
+    const num=item.querySelector('.ps-item-num')?.textContent;
+    if(!num?.startsWith('P')) return;
+    const pid=num.slice(1);
+    const st=p.phases?.[pid]?.status||'todo';
+    const dot=item.querySelector('.ps-dot');
+    if(dot) dot.className=`ps-dot ${st==='done'?'d-done':st==='active'?'d-active':'d-todo'}`;
+  });
+  // Update progress
+  const pct=phasePct(p);
+  const done=PHASES.filter(ph=>p.phases?.[ph.id]?.status==='done').length;
+  const fill=document.querySelector('.ps-prog-fill');
+  if(fill) fill.style.width=pct+'%';
+  const lbl=document.querySelector('.ps-prog-label span:last-child');
+  if(lbl) lbl.textContent=`${done}/${PHASES.length}`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// ASSEMBLY — NOTE FINALE
+// ══════════════════════════════════════════════════════════════
+
+function renderAssembly() {
+  const p=getProfile(CUR_PROFILE);
+  const notePhases=[3,4,5,'6b',7];
+  const done=notePhases.filter(id=>p.phases?.[id]?.content).length;
+  const total=notePhases.length;
+
+  el('pmain').innerHTML=`<div class="assembly-view">
+    <div class="phase-kicker">Assemblage final</div>
+    <h2 class="phase-title">Note de Synthèse</h2>
+    <p class="phase-desc-text">Assemblez les phases rédigées en un document HTML complet — couverture, introduction, actes, tribu, annexe, page signature. Puis ouvrez dans votre navigateur → Imprimer → Enregistrer en PDF.</p>
+
+    <div class="assembly-status">
+      <div class="ast-card"><div class="ast-num">${done}/${total}</div><div class="ast-label">Phases prêtes</div></div>
+      <div class="ast-card"><div class="ast-num">${PHASES.filter(ph=>p.phases?.[ph.id]?.status==='done').length}</div><div class="ast-label">Phases complètes</div></div>
+      <div class="ast-card"><div class="ast-num">${Math.round(done/total*100)}%</div><div class="ast-label">Contenu disponible</div></div>
+    </div>
+
+    <div class="assembly-phases">
+      ${notePhases.map(id=>{
+        const ph=PHASES.find(x=>String(x.id)===String(id));
+        const has=!!(p.phases?.[id]?.content);
+        return `<div class="aph-item">
+          <span class="aph-num">P${id}</span>
+          <span class="aph-title">${ph?.title||'Phase '+id}</span>
+          <span class="aph-badge ${has?'aph-ok':'aph-miss'}">${has?'✓ Prêt':'Manquant'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="assembly-actions">
+      <button class="btn-assemble" onclick="assembleNote()" ${done===0?'disabled':''}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        Assembler la note
+      </button>
+      <div id="dl-btn"></div>
+    </div>
+
+    <div class="assembly-output hidden" id="asm-out">
+      <div class="card-head" style="padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border)">
+        <span class="card-label">Aperçu du document assemblé</span>
+        <div class="card-actions"><button class="btn-xs-light" onclick="copyText(el('asm-text')?.value)">Copier HTML</button></div>
+      </div>
+      <textarea id="asm-text" style="width:100%;min-height:200px;padding:16px 18px;background:var(--surface);border:none;font-family:'DM Mono',monospace;font-size:.65rem;line-height:1.6;color:var(--text2);resize:vertical;outline:none"></textarea>
+    </div>
+  </div>`;
+}
+
+function assembleNote() {
+  const p=getProfile(CUR_PROFILE);
+  const prenom=p.name||'';
+  const dob=p.questionnaire?.date_naissance||'';
+  const today=new Date().toLocaleDateString('fr-FR');
+
+  // Collect phase content
+  const get=(id)=>p.phases?.[id]?.content||'';
+  const c3=get(3), c4=get(4), c5=get(5), c6=get('6b'), c7=get(7);
+
+  // md→html conversion
+  function md(text) {
+    if(!text) return '<p style="color:#888;font-style:italic">[Contenu non généré]</p>';
+    let t=text;
+    // Tables
+    t=t.replace(/^\|(.+)\|\s*$/gm,(m,row)=>{
+      if(row.includes('---')) return '';
+      const cells=row.split('|').map(c=>`<td style="padding:8px 12px;border:1px solid #E0DAD2;font-size:13px">${c.trim()}</td>`).join('');
+      return `<tr>${cells}</tr>`;
+    });
+    t=t.replace(/<tr>[\s\S]*?<\/tr>/g,m=>`<table style="width:100%;border-collapse:collapse;margin:16px 0">${m}</table>`);
+    // Headers
+    t=t.replace(/^### (.+)$/gm,'<h4 style="font-family:Playfair Display,serif;font-size:16px;color:#1A2E44;margin:20px 0 8px">$1</h4>');
+    t=t.replace(/^## (.+)$/gm,'<h3 style="font-family:Playfair Display,serif;font-size:19px;color:#1A2E44;margin:28px 0 10px;border-bottom:1px solid #E0DAD2;padding-bottom:8px">$1</h3>');
+    t=t.replace(/^# (.+)$/gm,'<h2 style="font-family:Playfair Display,serif;font-size:22px;color:#1A2E44;margin:36px 0 12px">$1</h2>');
+    // Bold/italic
+    t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    t=t.replace(/\*(.+?)\*/g,'<em>$1</em>');
+    // HR
+    t=t.replace(/^---+$/gm,'<hr style="border:none;border-top:1px solid #E0DAD2;margin:24px 0">');
+    // Paragraphs
+    t=t.split('\n\n').map(para=>{
+      para=para.trim();
+      if(!para) return '';
+      if(para.startsWith('<')) return para;
+      return `<p style="margin:0 0 16px;line-height:1.8;font-size:14.5px;color:#2A3A4A">${para.replace(/\n/g,'<br>')}</p>`;
+    }).join('\n');
+    return t;
+  }
+
+  const introText=`Il existe de très nombreux modèles d'analyse de la psyché humaine. Ils sont tous utiles, mais avec des axes d'analyse différents : profils de personnalité, structures d'ombre, généalogie, cycles temporels.<br><br>
+Pris séparément, chacun éclaire une facette de la structure personnelle. Il n'existe pas de solution aujourd'hui pour avoir une vision absolue de la structure humaine interne.<br><br>
+Le projet FYM n'a pas cette ambition.<br><br>
+Toutefois, en rapprochant des modèles indépendants choisis pour leur complémentarité il permet d'identifier leurs synergies et leurs contradictions. Ce sont précisément ces contradictions qui correspondent à nos conflits intérieurs les plus actifs.<br><br>
+Les voir nommées avec précision, depuis plusieurs angles simultanément, produit quelque chose que chaque approche isolée ne peut pas produire : une cartographie des structures sous-jacentes de la personnalité.<br><br>
+Ce document est le résultat de ce croisement appliqué à un individu unique.<br><br>
+<strong>Ce que ce document ne fait pas :</strong><br>
+— Il ne dit pas qui vous êtes<br>
+— Il ne dit pas qui vous devriez être<br>
+— Il ne propose pas de programme de transformation<br>
+— Il ne cherche pas à vous valider, vous encourager ou à vous consoler.<br><br>
+<strong>Ce que ce document fait :</strong><br>
+— Il montre comment la structure identitaire s'est construite.<br>
+— Il nomme les mécaniques qui tournent automatiquement.<br>
+— Il identifie ce qui freine et ce qui est déjà là.<br>
+— Il ouvre vers ce qui devient possible quand ces mécaniques sont vues — non comme des défauts à corriger, mais comme une architecture à reconnaître.<br><br>
+<em style="font-family:Playfair Display,serif;font-size:16px">« La créativité ne se libère pas. Elle se révèle. »</em>`;
+
+  const html=`<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Note de Synthèse — ${esc(prenom)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;background:#F5F3EF;color:#1A2E44;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page-break{page-break-after:always;break-after:page}
+  @page{margin:20mm 18mm}
+  @media print{body{background:white}.no-print{display:none}}
+  .cover{background:#1A2E44;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:60px 64px;position:relative}
+  .cover-top-rule{position:absolute;top:0;left:0;right:0;height:3px;background:#C8956A}
+  .cover-fym{font-size:10px;letter-spacing:6px;text-transform:uppercase;color:#8C9DAD;position:absolute;top:32px;left:64px}
+  .cover-title{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:#F8F6F2;line-height:1.05;margin-bottom:24px}
+  .cover-name{font-size:22px;color:#8C9DAD;margin-bottom:6px}
+  .cover-dob{font-size:14px;color:#6B6660;margin-bottom:32px}
+  .cover-meta{display:flex;justify-content:space-between;padding-top:20px;border-top:1px solid rgba(200,196,188,.15);font-size:12px;color:#6B6660}
+  .intro-page{background:#F8F6F2;min-height:100vh;display:flex;align-items:center;padding:80px 80px}
+  .intro-inner{max-width:600px;margin:0 auto}
+  .intro-rule{width:48px;height:2px;background:#C8956A;margin-bottom:40px}
+  .content-page{background:white;padding:72px 80px;min-height:100vh}
+  .section-header{margin-bottom:40px;padding-bottom:16px;border-bottom:2px solid #C8956A}
+  .section-num{font-family:'DM Sans',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#C8956A;margin-bottom:8px}
+  .section-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#1A2E44}
+  .section-sub{font-size:13px;color:#8C9DAD;margin-top:4px;font-style:italic}
+  .sig-page{background:#1A2E44;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center}
+  .sig-inner{position:relative}
+  .sig-fym{font-size:10px;letter-spacing:6px;text-transform:uppercase;color:#8C9DAD;margin-bottom:32px}
+  .sig-rule{width:80px;height:1px;background:#C8956A;margin:24px auto}
+  .sig-line1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#F8F6F2;margin-bottom:10px}
+  .sig-line2{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#C8956A}
+  .blank-page{min-height:100vh;background:white}
+</style>
+</head>
+<body>
+
+<!-- COUVERTURE -->
+<div class="cover page-break">
+  <div class="cover-top-rule"></div>
+  <div class="cover-fym">F R E E &nbsp; Y O U R &nbsp; M I N D</div>
+  <div class="cover-title">Note de<br>Synthèse</div>
+  <div class="cover-name">${esc(prenom)}</div>
+  ${dob?`<div class="cover-dob">Né(e) le ${esc(dob)}</div>`:''}
+  <div class="cover-meta">
+    <span>Produit le ${today}</span>
+    <span>Document confidentiel</span>
+  </div>
+</div>
+
+<!-- INTRODUCTION -->
+<div class="intro-page page-break">
+  <div class="intro-inner">
+    <div class="intro-rule"></div>
+    <div style="font-size:14.5px;line-height:1.85;color:#2A3A4A">${introText}</div>
+  </div>
+</div>
+
+<!-- PROLOGUE & ACTE I -->
+<div class="content-page page-break">
+  <div class="section-header">
+    <div class="section-num">Prologue · Acte I</div>
+    <div class="section-title">Ce qui lit ces lignes<br>Ce qui a été reçu</div>
+    <div class="section-sub">Ce que vous n'avez pas choisi</div>
+  </div>
+  ${md(c3)}
+</div>
+
+<!-- ACTE II & III -->
+<div class="content-page page-break">
+  <div class="section-header">
+    <div class="section-num">Acte II · Acte III</div>
+    <div class="section-title">Les mécaniques qui tournent<br>La programmation consciente</div>
+    <div class="section-sub">Ce que ça a coûté et produit · Ce que vous en faites</div>
+  </div>
+  ${md(c4)}
+</div>
+
+<!-- ACTE IV -->
+<div class="content-page page-break">
+  <div class="section-header">
+    <div class="section-num">Acte IV</div>
+    <div class="section-title">Le moment précis.<br>Le lieu exact.</div>
+    <div class="section-sub">Où vous en êtes et ce qui est possible</div>
+  </div>
+  ${md(c5)}
+</div>
+
+<!-- TRIBU -->
+<div class="content-page page-break">
+  <div class="section-header">
+    <div class="section-num">Chapitre Tribu</div>
+    <div class="section-title">Les amis qui vous coûtent cher.<br>Les vrais amis.</div>
+    <div class="section-sub">14 personnages — votre écosystème intérieur</div>
+  </div>
+  ${md(c6)}
+</div>
+
+<!-- ANNEXE & CLÔTURE -->
+<div class="content-page page-break">
+  <div class="section-header">
+    <div class="section-num">Annexe pratique · Miroir final</div>
+    <div class="section-title">Conditions concrètes.<br>Miroir. Clôture.</div>
+  </div>
+  ${md(c7)}
+</div>
+
+<!-- PAGE SIGNATURE -->
+<div class="sig-page page-break">
+  <div class="sig-inner">
+    <div class="sig-fym">F R E E &nbsp; Y O U R &nbsp; M I N D</div>
+    <div class="sig-rule"></div>
+    <div class="sig-line1">Vous n'êtes pas le créateur.</div>
+    <div class="sig-rule"></div>
+    <div class="sig-line2">Vous êtes la création.</div>
+  </div>
+</div>
+
+<!-- PAGE BLANCHE -->
+<div class="blank-page"></div>
+
+</body>
+</html>`;
+
+  // Show in UI
+  const outDiv=el('asm-out');
+  if(outDiv) {
+    outDiv.classList.remove('hidden');
+    const ta=el('asm-text');
+    if(ta) ta.value=html;
+  }
+
+  // Download button
+  const dlBtn=el('dl-btn');
+  if(dlBtn) {
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const fname=`Note_Synthese_${prenom.replace(/\s+/g,'_')||'FYM'}_${today.replace(/\//g,'-')}.html`;
+    dlBtn.innerHTML=`<a href="${url}" download="${esc(fname)}" style="text-decoration:none">
+      <button class="btn-download">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Télécharger la note HTML
+      </button>
+    </a>
+    <p style="font-size:.72rem;color:var(--text3);margin-top:8px">Ouvrir dans un navigateur → Fichier → Imprimer → Enregistrer en PDF</p>`;
+  }
+
+  toast('✓ Note assemblée — prête à télécharger','ok');
+}
+
+// ══════════════════════════════════════════════════════════════
+// CHECKLIST
+// ══════════════════════════════════════════════════════════════
+
+function renderChecklist() {
+  const p=getProfile(CUR_PROFILE);
+  const checked=Object.values(p.checks||{}).filter(Boolean).length;
+  el('pmain').innerHTML=`<div class="check-view">
+    <div class="phase-kicker">Vérification finale</div>
+    <h2 class="phase-title">11 points · Avant livraison</h2>
+    <p class="phase-desc-text" style="margin-bottom:24px">Cochez chaque point. Les 11 doivent être satisfaisants.</p>
+    <div class="check-list">
+      ${CHECKLIST.map((t,i)=>{
+        const on=p.checks?.[i]||false;
+        return `<div class="ci ${on?'on':''}" onclick="toggleCI(${i},this)">
+          <div class="ci-box"><svg viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4.5 4.5,8 11,1"/></svg></div>
+          <span class="ci-n">${String(i+1).padStart(2,'0')}</span>
+          <span class="ci-t">${esc(t)}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="check-result">
+      <div class="cr-n" id="crn">${checked}/11</div>
+      <div class="cr-l">points validés</div>
+      <div class="${checked===11?'cr-b cr-ok':'cr-b cr-nok'}" id="crb">
+        ${checked===11?'✓ NOTE FYM V5 PRODUITE':`En cours (${11-checked} restants)`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCI(i, el) {
+  const p=getProfile(CUR_PROFILE);
+  if(!p.checks) p.checks={};
+  p.checks[i]=!p.checks[i]; save();
+  el.classList.toggle('on',p.checks[i]);
+  const c=Object.values(p.checks).filter(Boolean).length;
+  const n=document.getElementById('crn'), b=document.getElementById('crb');
+  if(n) n.textContent=`${c}/11`;
+  if(b){ b.textContent=c===11?'✓ NOTE FYM V5 PRODUITE':`En cours (${11-c} restants)`; b.className=c===11?'cr-b cr-ok':'cr-b cr-nok'; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// CLAUDE API
+// ══════════════════════════════════════════════════════════════
+
+function buildMessages(profile, targetId) {
+  const msgs=[];
+  const tIdx=PHASES.findIndex(x=>String(x.id)===String(targetId));
+  msgs.push({role:'user',content:PHASES[0].prompt});
+  msgs.push({role:'assistant',content:'Compris. Posture intégrée. Prêt pour la Phase 2.'});
+  for(let i=1;i<tIdx;i++){
+    const ph=PHASES[i];
+    let uc=ph.prompt;
+    if(ph.id===2&&profile.questionnaire) uc=uc.replace('[QUESTIONNAIRE_DATA]',formatQ(profile.questionnaire));
+    msgs.push({role:'user',content:uc});
+    const out=profile.phases?.[ph.id]?.content;
+    msgs.push({role:'assistant',content:out||`[Phase ${ph.id} — non encore générée]`});
+  }
+  let cur=PHASES[tIdx].prompt;
+  if(PHASES[tIdx].id===2&&profile.questionnaire) cur=cur.replace('[QUESTIONNAIRE_DATA]',formatQ(profile.questionnaire));
+  msgs.push({role:'user',content:cur});
+  return msgs;
+}
+
+async function generatePhase() {
+  if(GENERATING) return;
+  if(!S.apiKey){toast('Clé API requise','err');return;}
+  const profile=getProfile(CUR_PROFILE);
+  const ph=PHASES.find(x=>String(x.id)===String(CUR_PHASE));
+  if(!profile||!ph) return;
+
+  GENERATING=true; STOP_GEN=false;
+  const bgen=el('bgen'), bstop=el('bstop'), gout=el('gout');
+  if(bgen){bgen.disabled=true;bgen.innerHTML='<div class="spin"></div> Génération…';}
+  if(bstop) bstop.style.display='inline-flex';
+  if(gout){gout.value='';gout.classList.add('streaming');}
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:ph.maxT||4000,stream:true,messages:buildMessages(profile,CUR_PHASE)})
+    });
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`Erreur ${res.status}`);}
+    CUR_READER=res.body.getReader();
+    const dec=new TextDecoder();
+    let full='';
+    while(true){
+      if(STOP_GEN){CUR_READER.cancel();break;}
+      const {done,value}=await CUR_READER.read();
+      if(done) break;
+      for(const line of dec.decode(value,{stream:true}).split('\n')){
+        if(!line.startsWith('data: ')) continue;
+        const d=line.slice(6).trim();
+        if(!d||d==='[DONE]') continue;
+        try{
+          const j=JSON.parse(d);
+          if(j.type==='content_block_delta'&&j.delta?.type==='text_delta'){
+            full+=j.delta.text;
+            if(gout){gout.value=full;gout.scrollTop=gout.scrollHeight;}
+          }
+        }catch(e){}
+      }
+    }
+    if(!profile.phases[CUR_PHASE]) profile.phases[CUR_PHASE]={};
+    profile.phases[CUR_PHASE].content=full;
+    profile.phases[CUR_PHASE].status=full?'done':'todo';
+    save();
+    if(full) toast('✓ Génération terminée et sauvegardée','ok');
+    refreshSidebar();
+  } catch(err){
+    toast('Erreur : '+err.message,'err');
+    if(gout) gout.value=(gout.value||'')+'\n\n[Erreur : '+err.message+']';
+  } finally {
+    GENERATING=false; CUR_READER=null;
+    if(bgen){bgen.disabled=!S.apiKey;bgen.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg> Générer avec Claude';}
+    if(bstop) bstop.style.display='none';
+    if(gout) gout.classList.remove('streaming');
+  }
+}
+
+function stopGen(){STOP_GEN=true;if(CUR_READER) CUR_READER.cancel().catch(()=>{});toast('Génération arrêtée');}
+
+// ══════════════════════════════════════════════════════════════
+// QUESTIONNAIRE FORMAT
+// ══════════════════════════════════════════════════════════════
+
+function formatQ(q) {
+  if(!q||!Object.keys(q).length) return '[Questionnaire non rempli]';
+  const L=(label,val)=>`${label} : ${val||'N/A'}\n`;
+  const C=(vals)=>Array.isArray(vals)&&vals.length?vals.join(', '):'Aucun';
+  let t='════════════════════════════════════════\nQUESTIONNAIRE FYM V4\n════════════════════════════════════════\n\n';
+  t+='━━━ SECTION A — IDENTITÉ & BIOGRAPHIE ━━━\n\n';
+  t+=L('Date de naissance',q.date_naissance)+L('Heure de naissance',q.heure_naissance)+L('Lieu de naissance',q.lieu_naissance);
+  t+=L('Résidence',q.residence)+L('Sexe',q.sexe)+L('Fratrie',q.fratrie)+L('Situation',q.situation)+L('Situation parents',q.situation_parents)+L('Heure réveil',q.reveil)+L('Saison vitalité',q.saison);
+  t+='\nLIEUX DE VIE :\n';
+  for(let i=1;i<=5;i++) if(q[`lieu_${i}`]) t+=`${i}. ${q[`lieu_${i}`]} — ${q[`periode_${i}`]||''}\n`;
+  t+=`\nÉVÉNEMENTS MAJEURS :\n${q.event_1?'— '+q.event_1+'\n':''}${q.event_2?'— '+q.event_2+'\n':''}${q.event_3?'— '+q.event_3+'\n':''}`;
+  t+=`\nPATTERNS : ${C(q.pat)}\n${q.pat_autre?'Autre : '+q.pat_autre+'\n':''}`;
+  t+=`\nQ_action : ${q.action_q1||'N/A'}\nQ_corps : ${q.action_q2||'N/A'}\nQ_observateur : ${q.action_q3||'N/A'}\n`;
+  t+=`\nRÉSISTANCES : ${C(q.res)}\n${q.res_autre?'Autre : '+q.res_autre+'\n':''}`;
+  t+='\n━━━ SECTION B — LIGNÉE & PSYCHOGÉNÉALOGIE ━━━\n\n';
+  [['Père','pere'],['Mère','mere'],['GP paternel','gpat'],['GM paternelle','gmat_p'],['GP maternel','gmat'],['GM maternelle','gmam']].forEach(([l,k])=>{t+=`${l} : ${q[`${k}_dn`]||'N/A'} · ${q[`${k}_lieu`]||'N/A'}\n`;});
+  if(q.lignee_events) t+=`\nÉvénements familiaux :\n${q.lignee_events}\n`;
+  t+='\n━━━ SECTION C — PROCESSUS D\'ÉVEIL ━━━\n\n';
+  t+=L('Depuis quand',q.depuis_quand)+`Déclencheurs : ${C(q.decl)}\n${q.decl_autre?'Autre : '+q.decl_autre+'\n':''}`;
+  if(q.demarches) t+=`\nDémarches :\n${q.demarches}\n`;
+  if(q.avancees) t+=`\nAvancées réelles :\n${q.avancees}\n`;
+  if(q.resistance_c) t+=`\nCe qui résiste :\n${q.resistance_c}\n`;
+  if(q.stade_actuel) t+=`\nStade actuel :\n${q.stade_actuel}\n`;
+  t+=`\nPratique : ${C(q.pratique)}\n`;
+  t+='\n━━━ SECTION D — ENNÉAGRAMME ━━━\n\n';
+  if(q.enneagram_q1) t+=`Ce que je ne me permets pas :\n${q.enneagram_q1}\n\n`;
+  if(q.enneagram_q2) t+=`Sous pression :\n${q.enneagram_q2}\n\n`;
+  if(q.enneagram_q3) t+=`Rapport perfection/erreur :\n${q.enneagram_q3}\n\n`;
+  if(q.enneagram_q4) t+=`Relations proches :\n${q.enneagram_q4}\n\n`;
+  if(q.enneagram_q5) t+=`Ce que je redoute d'être vu comme :\n${q.enneagram_q5}\n\n`;
+  t+='\n━━━ SECTION E — SCT LOEVINGER ━━━\n\n';
+  [['critique','Quand on me critique'],['regles','Les règles'],['attends','Ce que j\'attends des autres'],['naccepte','Ce que je n\'accepte pas'],['difficulte','Ma principale difficulté'],['souffrance','La souffrance'],['fierte','Ce dont je suis fier(e)'],['jamais_dit','Ce que je n\'ai jamais dit'],['trompe','Quand je me trompe'],['vieillissant','En vieillissant']].forEach(([k,l])=>{if(q[`sct_${k}`])t+=`${l} :\n${q[`sct_${k}`]}\n\n`;});
+  t+='\n━━━ SECTION F — AUTO-OBSERVATION ━━━\n\n';
+  ['q1','q2','q3','q4','q5','q6','q7'].forEach(k=>{if(q[k])t+=`${k.toUpperCase()} : Réponse ${q[k]}\n`;});
+  t+='\n';
+  if(q.q8) t+=`Q8 — Ce que je ne me permets pas :\n${q.q8}\n\n`;
+  if(q.q9) t+=`Q9 — Je suis là parce que :\n${q.q9}\n\n`;
+  if(q.q10) t+=`Q10 — Ce que j'attends :\n${q.q10}\n\n`;
+  if(q.q11) t+=`Q11 — Mal agir (exemple concret) :\n${q.q11}\n\n`;
+  if(q.q12) t+=`Q12 — Ce que je ne veux pas changer :\n${q.q12}\n\n`;
+  if(q.q13) t+=`Q13 — Ce que j'évite de regarder :\n${q.q13}\n\n`;
+  return t;
+}
+
+function generateShareCode(q) { try{return btoa(unescape(encodeURIComponent(JSON.stringify(q))))}catch(e){return null} }
+function decodeCode(c) { try{return JSON.parse(decodeURIComponent(escape(atob(c))))}catch(e){return null} }
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+
+loadState();
+route(location.hash||'');
+</script>
+</body>
+</html>
